@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>CascadiaCode.ttf</file>
+        <file>Icon/exit.svg</file>
+        <file>Icon/topmost.svg</file>
+        <file>Icon/topmost2.svg</file>
+    </qresource>
+</RCC>
