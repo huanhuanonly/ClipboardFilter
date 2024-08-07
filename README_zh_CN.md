@@ -1,11 +1,11 @@
 [![PickLanguage](https://img.shields.io/badge/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-English-green
 )](README_zh_CN.md)
 
+---
+
 # The ClipboardFilter
 
 > 监听剪贴板并过滤其内容，支持正则表达式替换文本。
-
----
 
 ## 描述
 - 如果你想删除一些字符：
@@ -32,3 +32,5 @@
 如果你是 *Windows* 系统，可以直接下载编译后的可执行文件 `ClipboardFilter.exe`，双击运行。
 
 > 您的配置文件将存储在 `%temp%/ClipboardFilter.ini`。
+
+_**By huanhuanonly.**_

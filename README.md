@@ -1,11 +1,10 @@
 [![PickLanguage](https://img.shields.io/badge/English-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-green
 )](README_zh_CN.md)
+---
 
 # The ClipboardFilter
 
 > Monitor the clipboard and filter its contents, supporting regular expressions to replace text.
-
----
 
 ## Description
 - If you want to delete some characters:
@@ -32,3 +31,5 @@ In addition, it also supports the other two text matching methods, just need to 
 If you are using *Windows* system, you can directly download the compiled executable file `ClipboardFilter.exe` and **double-click** it to _run_.
 
 > Your configuration file will be saved in `%temp%/ClipboardFilter.ini`.
+
+_**By huanhuanonly.**_
