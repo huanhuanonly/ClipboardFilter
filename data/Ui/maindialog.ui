@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainDialog</class>
+ <widget class="QDialog" name="MainDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>554</width>
+    <height>358</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">*
+{
+	color: rgb(229, 229, 229);
+	background-color: rgb(30, 30, 30);
+}
+
+QToolTip
+{
+	border: 1px solid rgb(34, 255, 229);
+	border-radius: 5px;
+	color: rgb(229, 229, 229);
+	background-color: rgb(30, 30, 30);
+}
+
+QPushButton
+{
+	border: 1px solid rgb(172, 172, 172);
+	border-radius: 12px;
+	padding: 5px 5px 5px 5px;
+	background-color: rgb(51, 51, 51);
+}
+QPushButton:hover
+{
+	border: 1px solid rgb(0, 168, 168);
+	color: rgb(0, 255, 0);
+	background-color: rgb(65, 97, 97);
+}
+QPushButton:focus
+{
+	border: 1px solid rgb(0, 255, 255);
+}
+QPushButton:pressed
+{
+	border: 1px inset rgb(0, 255, 255);
+	color: rgb(0, 255, 0);
+	background-color: rgb(0, 121, 181);
+}
+QPushButton:!enabled
+{
+	color: rgb(144, 144, 144);
+}
+
+QCheckBox:indicator
+{
+	border: 1px solid rgb(255, 255, 255);
+	border-radius: 6px;
+}
+QCheckBox:indicator:hover, QCheckBox:indicator:focus
+{
+	border-color: rgb(0, 255, 255);
+}
+QCheckBox:indicator:checked
+{
+	background-color: rgb(0, 255, 255);
+}
+
+QTableView
+{
+	alternate-background-color: rgb(60, 90, 90);
+	gridline-color: rgb(77, 116, 116);
+	border: 1px solid rgb(170, 255, 255);
+	color: rgb(255, 255, 255);
+}
+QHeaderView::section
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 55, 56);
+    text-align: center;
+}
+QTableView::item
+{
+    selection-background-color: rgb(30, 60, 90);
+}
+
+QSlider::handle
+{
+	border: 1px solid rgb(0, 255, 127);
+	border-radius: 5px;
+	background-color: rgba(85, 255, 255, 165);
+}
+QSlider::handle:horizontal:hover
+{
+	border: 1px solid rgb(0, 255, 127);
+	background-color: rgb(85, 255, 255);
+}
+QSlider::sub-page
+{
+	background: rgb(235,97,0);
+	border-radius: 0px;
+	margin-top:8px;
+	margin-bottom:8px;
+}
+
+QMenu
+{
+	background-color: rgb(0, 0, 0);
+	color: rgb(255, 255, 255);
+}
+QMenu::item:selected
+{
+	border: 1px solid rgb(0, 255, 255);
+	border-radius: 5px;
+}
+QMenu::item:!enabled
+{
+	color: rgb(109, 109, 109);
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>11</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>11</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox_characterList">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Character set to use for filtering</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="LineEditWithVariables" name="characterListBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Delete&lt;/span&gt; these characters from the clipboard&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLineEdit
+{
+	border: 1px solid rgb(106, 106, 106);
+	border-radius: 5px;
+	background-color: rgb(63, 63, 63);
+	selection-color: rgb(255, 0, 0);
+	selection-background-color: rgb(85, 255, 255);
+}
+QLineEdit:hover
+{
+	border: 1px solid rgb(14, 213, 0);
+	background-color: rgb(53, 53, 53);
+}
+QLineEdit:focus
+{
+	border: 2px solid rgb(14, 213, 0);
+}</string>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget_escapeCharacter" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>149</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="enableVariablesCheckBox">
+           <property name="toolTip">
+            <string>Use predefined variables in the format ${VARIABLE:PARAMS}</string>
+           </property>
+           <property name="text">
+            <string>Enable &amp;Variables</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="parseButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If variables are enabled, &lt;span style=&quot; font-weight:700;&quot;&gt;parse&lt;/span&gt; the variable in the input box once&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>parse</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_replaceList">
+     <property name="title">
+      <string>Replacer's Rule Item</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_InsertAndRemove" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="StatusBarLabel" name="labelStatusBar">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current working status&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::MarkdownText</enum>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelCopyright">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;The ClipboardFilter&lt;/span&gt;, by &lt;span style=&quot; font-style:italic;&quot;&gt;YangHuanhuan&lt;/span&gt;&lt;/p&gt;&lt;p&gt;in &lt;span style=&quot; text-decoration: underline;&quot;&gt;December 2023&lt;/span&gt; for &lt;span style=&quot; font-style:italic;&quot;&gt;YuFeixia&lt;/span&gt;. All rights reserved.&lt;/p&gt;&lt;p&gt;Last update in &lt;span style=&quot; text-decoration: underline;&quot;&gt;September 2024&lt;/span&gt;&lt;/p&gt;&lt;p&gt;---&lt;/p&gt;&lt;p&gt;E-mail: &lt;span style=&quot; font-weight:700;&quot;&gt;3347484963@qq.com &lt;/span&gt;or&lt;span style=&quot; font-weight:700;&quot;&gt; huanhuanonly@gmail.com&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Github: &lt;a href=&quot;https://github.com/huanhuanonly/ClipboardFilter&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline; color:#8ab4f8;&quot;&gt;https://github.com/huanhuanonly/ClipboardFilter&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>10000</number>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:6pt; font-weight:700;&quot;&gt;The ClipboardFilter&lt;/span&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;, by YangHuanhuan in&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;Dec 2023 for YuFeixia. All rights reserved.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="insertButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Insert&lt;/span&gt; a new row below the selection line&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>&amp;Insert</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="removeButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Remove&lt;/span&gt; the current selection line&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_logger">
+     <property name="title">
+      <string>Logger</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QTextBrowser" name="logBrowser"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_controlButton" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="clearButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Clear &lt;/span&gt;all settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>&amp;Clear</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stateButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Start&lt;/span&gt; or &lt;span style=&quot; font-weight:700;&quot;&gt;stop&lt;/span&gt; clipboard monitoring&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>&amp;Stop</string>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="updataButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Update&lt;/span&gt; the clipboard again using the above rules&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>&amp;Updata</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>StatusBarLabel</class>
+   <extends>QLabel</extends>
+   <header>StatusBarLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEditWithVariables</class>
+   <extends>QLineEdit</extends>
+   <header>TextEditWithVariables.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

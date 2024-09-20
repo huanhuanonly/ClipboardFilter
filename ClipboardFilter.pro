@@ -9,20 +9,31 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    maindialog.cpp
+    src/Logger.cpp \
+    src/TextReplacer.cpp \
+    src/VariableParser.cpp \
+    src/main.cpp \
+    src/maindialog.cpp
+
+INCLUDEPATH += include
 
 HEADERS += \
-    StringReplaceListView.h \
-    Titlebar.h \
-    hotkey.h \
-    maindialog.h
+    include/Logger.h \
+    include/StatusBarLabel.h \
+    include/TextEditWithVariables.h \
+    include/TextReplaceRuleListView.h \
+    include/TextReplacer.h \
+    include/Titlebar.h \
+    include/Trie.h \
+    include/VariableParser.h \
+    include/VariablesShader.h \
+    include/maindialog.h
 
 FORMS += \
-    maindialog.ui
+    data/Ui/maindialog.ui
 
 TRANSLATIONS += \
-    ClipboardFilter_zh_CN.ts
+    data/Ts/ClipboardFilter_zh_CN.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -32,12 +43,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 TARGET = "ClipboardFilter"
-VERSION = 1.0.0
+
+VERSION = 1.1.0
+DEFINES += __VERSION__=1.1.0
+
 QMAKE_TARGET_COMPANY = "YangHuanhuan"
 QMAKE_TARGET_PRODUCT = "ClipboardFilter"
 QMAKE_TARGET_DESCRIPTION = "ClipboardFilter"
-QMAKE_TARGET_COPYRIGHT = "Copyright (c) 2023-2023 YangHuanhuan 3347484963@qq.com.  All rights reserved."
+QMAKE_TARGET_COPYRIGHT = "Copyright (c) 2023-2024 YangHuanhuan 3347484963@qq.com.  All rights reserved."
 RC_LANG = 0x0004
 
 RESOURCES += \
-    res.qrc
+    data/res.qrc
+
+RC_ICONS += "data/Icon/MainIcon.ico"
