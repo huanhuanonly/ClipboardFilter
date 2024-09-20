@@ -1,4 +1,4 @@
-<style type="text/css">
+<!-- <style type="text/css">
     .ts
     {
         font-style: italic;
@@ -6,7 +6,7 @@
         text-decoration-color: #72ece9;
         text-decoration-style: wavy;
     }
-</style>
+</style> -->
 
 [![Install](https://img.shields.io/badge/Install-green
 )](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe)
@@ -22,14 +22,14 @@
 ## Update Log
 
 ### In December 2023
-* **Release** version v$1.0.0$
+* **Release** version $\text{v}1.0.0$
 
 ### In September 2024
 * **Fixed** some bugs and logic flaws;
 * **Added** status bar and log box;
 * **Removed** C-style escape characters (can be replaced by _variables_);
 * **Added** support for _variables_;
-* **Changed** version number to v$1.1.0$
+* **Changed** version number to $\text{v}1.1.0$
 
 [What's variable?](#about-variables)
 
