@@ -22,14 +22,14 @@
 ## Update Log
 
 ### In December 2023
-* **Release** version $\text{v}1.0.0$
+* **Release** version $\text{v}1.0.0$;
 
 ### In September 2024
 * **Fixed** some bugs and logic flaws;
 * **Added** status bar and log box;
 * **Removed** C-style escape characters (can be replaced by _variables_);
 * **Added** support for _variables_;
-* **Changed** version number to $\text{v}1.1.0$
+* **Changed** version number to $\text{v}1.1.0$;
 
 [What's variable?](#about-variables)
 
@@ -46,6 +46,9 @@ If you are using *Windows* system, you can directly download the compiled execut
 > Your configuration file will be saved in `%temp%/ClipboardFilter.ini`.  
 > <span class="ts">您的配置文件将存储在</span> `%temp%/ClipboardFilter.ini`<span class="ts">。</span>
 
+## Display
+
+![Home.png](https://github.com/huanhuanonly/ClipboardFilter/blob/main/data/Screenshot/home.png?raw=true)
 
 ## Tutorial
 
@@ -220,6 +223,9 @@ ${ variable-name : parameter }
 │  │      MainIcon.svg
 │  │      topmost.svg
 │  │      topmost2.svg
+│  │
+│  ├─Screenshot
+│  │      home.png
 │  │
 │  ├─Source
 │  │      MainIcon.ai
