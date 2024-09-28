@@ -8,11 +8,11 @@
     }
 </style> -->
 
-[![Install](https://img.shields.io/badge/Install-green
-)](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe)
+# The ClipboardFilter
 ---
 
-# The ClipboardFilter
+[![Install](https://img.shields.io/badge/Install-press-green?style=plastic&logo=AdGuard
+)](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe)
 
 ## Description
 
@@ -36,12 +36,16 @@
 ## Download
 
 ```git
-clone https://github.com/huanhuanonly/ClipboardFilter
+git clone https://github.com/huanhuanonly/ClipboardFilter
 ```
 
 If you are using *Windows* system, you can directly download the compiled executable file `ClipboardFilter.exe` and **double-click** it to _run_.
 
 <p class="ts">如果你是 Windows 系统，可以直接下载编译后的可执行文件 <b>ClipboardFilter.exe</b>，双击运行。</p>
+
+The executable file on the homepage is packaged using `Enigma Virtual Box`. It is normal for the firewall to report a virus. Please feel free to use it. You can also choose to use the unpackaged executable file `./bin/v1.1.0/ClipboardFilter.exe`.  
+
+<span class="ts">在主页中的可执行文件使用</span> `Enigma Virtual Box` <span class="ts">进行打包封装，防火墙报毒属于正常现象，请放心使用，也可以选择使用未打包封装的可执行文件</span> `./bin/v1.1.0/ClipboardFilter.exe`<span class="ts">。</span>
 
 > Your configuration file will be saved in `%temp%/ClipboardFilter.ini`.  
 > <span class="ts">您的配置文件将存储在</span> `%temp%/ClipboardFilter.ini`<span class="ts">。</span>
