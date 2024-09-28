@@ -102,8 +102,8 @@ ${ variable-name : parameter }
 
 * `random`: Get a random number (**integer**) in a specified range;
   * `param`: (_optional_) There are the following two formats:
-    * `lower_bound, upper_bound`: Return a random number in range $\left[lower\_bound, upper\_bound\right]$.
-    * `upper_bound`: Return a random number in range $\left[0, upper\_bound\right]$.
+    * `lower_bound, upper_bound`: Return a random number in range $\left[lower\_{bound}, upper\_{bound}\right]$.
+    * `upper_bound`: Return a random number in range $\left[0, upper\_{bound}\right]$.
   * For example:
     * `${random}` Returns a 64-bit random number;
     * `${random:-10,99}` Returns a random number between $-10$ and $99$ (inclusive);
