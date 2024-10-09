@@ -1,3 +1,11 @@
+/**
+ * @file VariablesShader.h
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief Variable shader
+ */
+
 #ifndef VARIABLESSHADER_H
 #define VARIABLESSHADER_H
 
@@ -86,7 +94,7 @@ public:
                     
                     if (meet == false)
                     {
-                        if (std::binary_search(_M_variables.begin(), _M_variables.end(), ins))
+                        if (std::binary_search(_M_variables.begin(), _M_variables.end(), ins.trimmed()))
                         {
                             setFormat(i - ins.size(), ins.size(), f_var_accept);
                         }
@@ -109,7 +117,7 @@ public:
                 {
                     meet = true;
                     
-                    if (std::binary_search(_M_variables.begin(), _M_variables.end(), ins))
+                    if (std::binary_search(_M_variables.begin(), _M_variables.end(), ins.trimmed()))
                     {
                         setFormat(i - ins.size(), ins.size(), f_var_accept);
                     }

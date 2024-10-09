@@ -1,23 +1,13 @@
-<!-- <style type="text/css">
-    .ts
-    {
-        font-style: italic;
-        text-decoration: underline;
-        text-decoration-color: #72ece9;
-        text-decoration-style: wavy;
-    }
-</style> -->
-
 # The ClipboardFilter
 ---
 
-[![Install](https://img.shields.io/badge/Install-press-green?style=plastic&logo=AdGuard
+[![Install](https://img.shields.io/badge/Install-PRESS-green?style=plastic&logo=AdGuard
 )](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe)
+[![简体中文](https://img.shields.io/badge/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-SWITCH-green?logo=googletranslate)](./README_zh-CN.md)
 
 ## Description
 
 > Monitor the clipboard, filter specified characters when the clipboard is written, and support regular expressions to replace matching text.
-> <p class="ts">监听剪贴板，在剪贴板写入时，过滤指定字符，并且支持正则表达式替换匹配的文本。</p>
 
 ## Update Log
 
@@ -29,9 +19,17 @@
 * **Added** status bar and log box;
 * **Removed** C-style escape characters (can be replaced by _variables_);
 * **Added** support for _variables_;
-* **Changed** version number to $\text{v}1.1.0$;
+* **Release** version $\text{v}1.1.0$;
 
 [What's variable?](#about-variables)
+
+### In October 2024
+* **Fixed** an issue where variables were not being parsed in some controls;
+* **Added** `before` and `after` buttons;
+* **Cancel** the display of the date of each log in the log bar;
+* The result of variable parsing will be displayed in the log bar;
+* **Added** background color for icons;
+* **Release** version $\text{v}1.1.1$;
 
 ## Download
 
@@ -41,14 +39,9 @@ git clone https://github.com/huanhuanonly/ClipboardFilter
 
 If you are using *Windows* system, you can directly download the compiled executable file `ClipboardFilter.exe` and **double-click** it to _run_.
 
-<p class="ts">如果你是 Windows 系统，可以直接下载编译后的可执行文件 <b>ClipboardFilter.exe</b>，双击运行。</p>
-
 The executable file on the homepage is packaged using `Enigma Virtual Box`. It is normal for the firewall to report a virus. Please feel free to use it. You can also choose to use the unpackaged executable file `./bin/v1.1.0/ClipboardFilter.exe`.  
 
-<span class="ts">在主页中的可执行文件使用</span> `Enigma Virtual Box` <span class="ts">进行打包封装，防火墙报毒属于正常现象，请放心使用，也可以选择使用未打包封装的可执行文件</span> `./bin/v1.1.0/ClipboardFilter.exe`<span class="ts">。</span>
-
-> Your configuration file will be saved in `%temp%/ClipboardFilter.ini`.  
-> <span class="ts">您的配置文件将存储在</span> `%temp%/ClipboardFilter.ini`<span class="ts">。</span>
+Your configuration file will be saved in `%temp%/ClipboardFilter.ini`.
 
 ## Display
 
@@ -66,24 +59,16 @@ Just add the characters that need to be filtered in the input field of `Characte
 
 Use the `insert` button in the `Replacer's Rule Item` group to insert and set the corresponding rules, which will be matched and replaced in order.
 
-<span class="ts">在</span> `Replacer's Rule Item` <span class="ts">组中使用</span> `insert` <span class="ts">按钮插入并设置对应的规则即可，按顺序匹配和替换。</span>
-
-> Note: First filter the characters, then do the text replacement.
-> <p class="ts">注意：先过滤字符，再进行文本替换。</p>
-
 ### About Variables
 
 Variables are parsed before each use and will be parsed as a specific string, which is also used for special character replacement.
 
-<p class="ts">变量在每次使用前被解析，将会被解析为一段指定的字符串，同时也用于特殊字符的替代品。</p>
-
 #### Syntax
 ```
-${ variable-name : parameter }
+${ variable-name [: parameter] }
 ```
 
-> `variable-names` are ***case-insensitive***
-> <p class="ts">变量名不区分大小写</p>
+`variable-names` are ***case-insensitive***.
 
 #### Built-in variables
 
@@ -147,72 +132,28 @@ ${ variable-name : parameter }
 ## Project Structure
 ```
 .
+│  .gitignore
+│  ClipboardFilter.exe
 │  ClipboardFilter.pro
 │  ClipboardFilter.pro.user
 │  README.md
+│  README_zh-CN.md
 │
 ├─bin
 │  ├─v1.0.0
 │  │      ClipboardFilter_1.0.0.exe
 │  │
-│  └─v1.1.0
-│      │  ClipboardFilter.exe
-│      │  D3Dcompiler_47.dll
-│      │  libEGL.dll
-│      │  libgcc_s_seh-1.dll
-│      │  libGLESv2.dll
-│      │  libstdc++-6.dll
-│      │  libwinpthread-1.dll
-│      │  opengl32sw.dll
-│      │  Qt5Core.dll
-│      │  Qt5Gui.dll
-│      │  Qt5Svg.dll
-│      │  Qt5Widgets.dll
-│      │
-│      ├─iconengines
-│      │      qsvgicon.dll
-│      │
-│      ├─imageformats
-│      │      qgif.dll
-│      │      qicns.dll
-│      │      qico.dll
-│      │      qjpeg.dll
-│      │      qsvg.dll
-│      │      qtga.dll
-│      │      qtiff.dll
-│      │      qwbmp.dll
-│      │      qwebp.dll
-│      │
-│      ├─platforms
-│      │      qwindows.dll
-│      │
-│      ├─styles
-│      │      qwindowsvistastyle.dll
-│      │
-│      └─translations
-│              qt_ar.qm
-│              qt_bg.qm
-│              qt_ca.qm
-│              qt_cs.qm
-│              qt_da.qm
-│              qt_de.qm
-│              qt_en.qm
-│              qt_es.qm
-│              qt_fi.qm
-│              qt_fr.qm
-│              qt_gd.qm
-│              qt_he.qm
-│              qt_hu.qm
-│              qt_it.qm
-│              qt_ja.qm
-│              qt_ko.qm
-│              qt_lv.qm
-│              qt_pl.qm
-│              qt_ru.qm
-│              qt_sk.qm
-│              qt_tr.qm
-│              qt_uk.qm
-│              qt_zh_TW.qm
+│  ├─v1.1.0
+│  │  │   ClipboardFilter_1.1.0.exe
+│  │  │
+│  │  └─...
+│  │
+│  └─v1.1.1
+│      │  ClipboardFilter_1.1.1.exe
+│      │  
+│      └─...
+│
+├─build
 │
 ├─data
 │  │  res.qrc
@@ -256,8 +197,8 @@ ${ variable-name : parameter }
        Logger.cpp
        main.cpp
        maindialog.cpp
-       TextReplacer.cpp
+       TextReplaceRuleListView.cpp
        VariableParser.cpp
 ```
 
-_**Copyright huanhuanonly. All rights reserved**_
+_**Copyright [huanhuanonly](https://github.com/huanhuanonly). All rights reserved.**_

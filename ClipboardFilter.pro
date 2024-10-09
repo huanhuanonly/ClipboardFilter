@@ -1,3 +1,6 @@
+# By YangHuanhuan (3347484963@qq.com)
+# Github: https://github.com/huanhuanonly/ClipboardFilter
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -10,10 +13,10 @@ CONFIG += c++17
 
 SOURCES += \
     src/Logger.cpp \
-    src/TextReplacer.cpp \
+    src/TextReplaceRuleListView.cpp \
     src/VariableParser.cpp \
     src/main.cpp \
-    src/maindialog.cpp
+    src/MainDialog.cpp
 
 INCLUDEPATH += include
 
@@ -27,7 +30,7 @@ HEADERS += \
     include/Trie.h \
     include/VariableParser.h \
     include/VariablesShader.h \
-    include/maindialog.h
+    include/MainDialog.h
 
 FORMS += \
     data/Ui/maindialog.ui
@@ -44,8 +47,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 TARGET = "ClipboardFilter"
 
-VERSION = 1.1.0
-DEFINES += __VERSION__=1.1.0
+VERSION = 1.1.1
+DEFINES += __VERSION__=1.1.1 \
+    SETTINGS__LOGGER_MAXCOUNT=520 \
+    SETTINGS__LOGGER_OUTPUT__RESULT_OF_VARIABLES=true \
+    SETTINGS__UPDATE_ON_STARTUP=false
 
 QMAKE_TARGET_COMPANY = "YangHuanhuan"
 QMAKE_TARGET_PRODUCT = "ClipboardFilter"

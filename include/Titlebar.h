@@ -1,3 +1,12 @@
+/**
+ * @file Titlebar.h
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief Customize the title bar to replace
+ *        the system default title bar
+ */
+
 #ifndef TITLEBAR_H
 #define TITLEBAR_H
 

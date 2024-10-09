@@ -1,3 +1,17 @@
+/**
+ * @file TextEditWithVariables.h
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief QTextEdit with additional support for variables
+ * 
+ * @include
+ *     @class TextEditWithVariables
+ *     
+ * @list VariableParser.h
+ *       VariablesShader.h
+ */
+
 #ifndef TEXTEDITWITHVARIABLES_H
 #define TEXTEDITWITHVARIABLES_H
 

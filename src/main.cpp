@@ -1,3 +1,11 @@
+/**
+ * @file VariableParser.cpp
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @implements main() function
+ */
+
 #include "maindialog.h"
 
 #include <QApplication>
@@ -9,7 +17,7 @@
 
 #include <QDebug>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
     

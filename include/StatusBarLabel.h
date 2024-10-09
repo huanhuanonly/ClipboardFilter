@@ -1,3 +1,15 @@
+/**
+ * @file StatusBarLabel.h
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief StatusBarLabel for MainDialog,
+ *        display current working status
+ * 
+ * @include
+ *     @class StatusBarLabel
+ */
+
 #ifndef STATUSBARLABEL_H
 #define STATUSBARLABEL_H
 
@@ -34,20 +46,30 @@ public:
     void setState(Status __state) noexcept
     {
         _M_state = __state;
-        
         _M_resetText();
         
         QString out = _M_map[__state];
         
-        if (_M_state != Status::Waiting)
+        if (_M_state == Status::Copied || _M_state == Status::Replaced)
         {
             QString text = QGuiApplication::clipboard()->text();
             QFontMetrics fm(QApplication::font());
             
-            out += tr(R"( with [%0] %1)").arg(text.size()).arg(fm.elidedText(text, Qt::ElideMiddle, fm.horizontalAdvance(text, 50), Qt::TextSingleLine));
+            out += tr(R"( with [%0] %1)")
+                    .arg(text.size())
+                    .arg(fm.elidedText(text, Qt::ElideMiddle, fm.horizontalAdvance(text, 50), Qt::TextSingleLine));
         }
         
         huanhuan::slog << out;
+        
+        if (_M_state == Status::Waiting)
+        {
+            huanhuan::slog << huanhuan::backline;
+        }
+        else
+        {
+            huanhuan::slog << huanhuan::endl;
+        }
         
         if (_M_state == Status::Replaced && _M_timerId == -1)
         {

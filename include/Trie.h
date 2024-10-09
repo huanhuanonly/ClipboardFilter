@@ -1,3 +1,15 @@
+/**
+ * @file Trie.h
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief Data structures, Trie Implementation
+ * 
+ * @include
+ *     @namespace huanhuan
+ *         @class Trie
+ */
+
 #ifndef TRIE_H
 #define TRIE_H
 
@@ -6,10 +18,15 @@
 namespace huanhuan
 {
 
-template<typename _KeyType, typename _ValueType>
+template<typename _KeyType, typename _ValueType,
+         typename _T = std::void_t<typename _KeyType::iterator,
+                                decltype(std::declval<_KeyType>().begin()),
+                                decltype(std::declval<_KeyType>().end())>>
 class Trie
 {
 public:
+    
+    static_assert(std::is_same_v<_T, void>, "The third template parameter should not be filled in!");
     
     using key_type = _KeyType;
     using value_type = _ValueType;

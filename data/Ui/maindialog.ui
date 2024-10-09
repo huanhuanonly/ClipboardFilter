@@ -204,6 +204,53 @@ QLineEdit:focus
           <number>0</number>
          </property>
          <item>
+          <widget class="QFrame" name="frame_order">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="beforeButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter the above characters &lt;span style=&quot; font-weight:700;&quot;&gt;before&lt;/span&gt; replacer's rule item&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>&amp;Before</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="afterButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter the above characters &lt;span style=&quot; font-weight:700;&quot;&gt;After&lt;/span&gt; replacer's rule item&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>&amp;After</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -219,7 +266,7 @@ QLineEdit:focus
          <item>
           <widget class="QCheckBox" name="enableVariablesCheckBox">
            <property name="toolTip">
-            <string>Use predefined variables in the format ${VARIABLE:PARAMS}</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use predefined variables in the format&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;${ &lt;/span&gt;VARIABLE &lt;span style=&quot; font-style:italic;&quot;&gt;[ &lt;/span&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;PARAMS] &lt;/span&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;}&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Enable &amp;Variables</string>
@@ -400,7 +447,7 @@ QLineEdit:focus
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="clearButton">
+       <widget class="QPushButton" name="resetButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -408,10 +455,10 @@ QLineEdit:focus
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Clear &lt;/span&gt;all settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Reset &lt;/span&gt;all settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>&amp;Clear</string>
+         <string>Reset</string>
         </property>
        </widget>
       </item>
@@ -431,7 +478,7 @@ QLineEdit:focus
       <item>
        <widget class="QPushButton" name="updataButton">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -441,6 +488,22 @@ QLineEdit:focus
         </property>
         <property name="text">
          <string>&amp;Updata</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clearButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Clear&lt;/span&gt; the clipboard contents&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>&amp;Clear</string>
         </property>
        </widget>
       </item>

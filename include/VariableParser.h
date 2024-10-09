@@ -1,3 +1,18 @@
+/**
+ * @file VariableParser.h
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief Parse and replace variables in text,
+ *        Defines and implements some default variables
+ * 
+ * @include
+ *     @namespace huanhuan
+ *         @class VariableParser
+ *     
+ * @list Trie.h
+ */
+
 #ifndef VARIABLEPARSER_H
 #define VARIABLEPARSER_H
 

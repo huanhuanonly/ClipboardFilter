@@ -1,3 +1,18 @@
+/**
+ * @file TextReplacer.h
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief Parse and replace variables in
+ *        text, and perform text replacement
+ * 
+ * @include
+ *     @namespace huanhuan
+ *         @class TextReplacer
+ *     
+ * @list VariableParser.h
+ */
+
 #ifndef TEXTREPLACER_H
 #define TEXTREPLACER_H
 
@@ -103,21 +118,21 @@ public:
         {
             case MatchOptions::None:
             {
-                res.replace(_M_rule.pattern, _M_rule.replacement);
+                res.replace(_M_rule.pattern, pattern);
                 break;
             }
             
             case MatchOptions::Wildcard:
             {
                 QRegExp regex(_M_rule.pattern, Qt::CaseSensitive, QRegExp::Wildcard);
-                res.replace(regex, _M_rule.replacement);
+                res.replace(regex, pattern);
                 break;
             }
             
             case MatchOptions::Regexp:
             {
                 QRegExp regex(_M_rule.pattern, Qt::CaseSensitive, QRegExp::RegExp2);
-                res.replace(regex, _M_rule.replacement);
+                res.replace(regex, pattern);
                 break;
             }
         }

@@ -1,4 +1,16 @@
+/**
+ * @file VariableParser.cpp
+ * 
+ * @author YangHuanhuan (3347484963@qq.com)
+ * 
+ * @brief Implement @class VariableParser
+ *     
+ * @list VariableParser.h
+ *       Logger.h
+ */
+
 #include "VariableParser.h"
+#include "Logger.h"
 
 using namespace huanhuan;
 
@@ -69,6 +81,16 @@ QString VariableParser::parse(const QString& text, const std::function<void(QStr
                 try
                 {
                     buffer.back() = (*func_ptr)(parameter, _M_callNumber);
+                    
+                    if constexpr (SETTINGS__LOGGER_OUTPUT__RESULT_OF_VARIABLES)
+                    {
+                        slog << QObject::tr("${ %0%1 } => [%2] %3")
+                                .arg(instruct)
+                                .arg(parameter.isEmpty() ? QString("") : QString(" : %0").arg(parameter))
+                                .arg(buffer.back().size())
+                                .arg(buffer.back())
+                             << backline;
+                    }
                 }
                 catch (const std::exception& e)
                 {
