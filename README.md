@@ -53,8 +53,6 @@ Your configuration file will be saved in `%temp%/ClipboardFilter.ini`.
 
 Just add the characters that need to be filtered in the input field of `Character set to use for filtering`. The order of input is not important.
 
-<span class="ts">在</span> `Character set to use for filtering` <span class="ts">的输入栏中加入需要过滤的字符即可，输入顺序并不重要。</span>
-
 * Replace the matched pattern string
 
 Use the `insert` button in the `Replacer's Rule Item` group to insert and set the corresponding rules, which will be matched and replaced in order.
