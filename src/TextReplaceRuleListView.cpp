@@ -16,7 +16,6 @@
 #include "TextEditWithVariables.h"
 #include "MainDialog.h"
 
-
 TextReplaceRuleListModel::
 TextReplaceRuleListModel(const QList<DataType>& initDataList, QObject* parent)
     : QStandardItemModel(initDataList.size(), DataType::size(), parent)
@@ -83,6 +82,25 @@ TextReplaceRuleListModel::data(const QModelIndex& index, int role) const
     }
     
     return QVariant();
+}
+
+
+bool
+TextReplaceRuleListModel::setData(const QModelIndex& index,
+                                  const QVariant& value,
+                                  int role)
+{
+    if (index.isValid() == false)
+    {
+        return false;
+    }
+    
+    if (role == Qt::EditRole)
+    {
+        itemFromIndex(index)->setData(value);
+        return true;
+    }
+    return false;
 }
 
 
