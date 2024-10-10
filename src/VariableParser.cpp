@@ -89,7 +89,7 @@ QString VariableParser::parse(const QString& text, const std::function<void(QStr
                                 .arg(parameter.isEmpty() ? QString("") : QString(" : %0").arg(parameter))
                                 .arg(buffer.back().size())
                                 .arg(buffer.back())
-                             << backline;
+                             << endl;
                     }
                 }
                 catch (const std::exception& e)
