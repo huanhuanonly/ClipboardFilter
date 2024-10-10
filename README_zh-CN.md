@@ -1,8 +1,8 @@
 # The ClipboardFilter
 ---
 
-[![安装](https://img.shields.io/badge/%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85-PRESS-green?style=plastic&logo=AdGuard)](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe)
-[![English](https://img.shields.io/badge/English-SWITCH-green?logo=googletranslate)](./README_zh-CN.md)
+[![一键安装](https://img.shields.io/badge/%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85-PRESS-green?style=plastic&logo=AdGuard)](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe)
+[![English](https://img.shields.io/badge/English-SWITCH-green?logo=googletranslate)](./README.md)
 
 ## 描述
 
@@ -36,11 +36,23 @@
 git clone https://github.com/huanhuanonly/ClipboardFilter
 ```
 
-如果您使用的是 *Windows* 系统，可以直接下载编译后的可执行文件 `ClipboardFilter.exe`，并 **双击** 运行。
+### 下载封装后的文件
 
-可执行文件在主页中使用 `Enigma Virtual Box` 进行打包，防火墙报毒属于正常现象，请放心使用。您也可以选择使用未打包的可执行文件 `./bin/v1.1.0/ClipboardFilter.exe`。
+点击 [![一键安装](https://img.shields.io/badge/%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85-PRESS-green?style=plastic&logo=AdGuard)](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe) 下载可执行文件 `ClipboardFilter.exe`，可以直接 **双击** 运行。
 
-您的配置文件将存储在 `%temp%/ClipboardFilter.ini`。
+它使用 `Enigma Virtual Box` 进行打包，防火墙可能报毒属于正常现象，如果介意请选择第二种方法。
+
+### 下载未封装的文件
+
+需要下载 `./bin/v1.1.1/` 目录下的所有文件。
+
+---
+
+**_另外的，无论使用哪种方法您的配置文件都将存储在 `%temp%/ClipboardFilter.ini`。_**
+
+如果您是 Windows 以外的系统，则需要手动编译。
+
+在目前，编写、测试和维护工作都在 Windows 平台上进行。
 
 ## 展示
 

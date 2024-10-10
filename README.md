@@ -37,11 +37,24 @@
 git clone https://github.com/huanhuanonly/ClipboardFilter
 ```
 
-If you are using *Windows* system, you can directly download the compiled executable file `ClipboardFilter.exe` and **double-click** it to _run_.
+### Download the Packaged File
 
-The executable file on the homepage is packaged using `Enigma Virtual Box`. It is normal for the firewall to report a virus. Please feel free to use it. You can also choose to use the unpackaged executable file `./bin/v1.1.0/ClipboardFilter.exe`.  
+Click [![Install](https://img.shields.io/badge/Install-PRESS-green?style=plastic&logo=AdGuard
+)](https://github.com/huanhuanonly/ClipboardFilter/raw/refs/heads/main/ClipboardFilter.exe) to download the executable file `ClipboardFilter.exe`, which can be run by **double-clicking** it.
 
-Your configuration file will be saved in `%temp%/ClipboardFilter.ini`.
+It is packaged using `Enigma Virtual Box`, and it's normal for the firewall to report a virus. If you are concerned, please choose the second method.
+
+### Download the Unpackaged File
+
+You need to download all files in the `./bin/v1.1.1/` directory.
+
+---
+
+**_Additionally, regardless of the method used, your configuration file will be stored in `%temp%/ClipboardFilter.ini`._**
+
+If you are using a system other than Windows, you will need to compile it manually.
+
+Currently, writing, testing, and maintenance work are being done on the Windows platform.
 
 ## Display
 
