@@ -4,6 +4,8 @@
  * @author YangHuanhuan (3347484963@qq.com)
  * 
  * @brief Main UI
+ * 
+ * @ingroup huanhuan::ui
  */
 
 #include "MainDialog.h"
@@ -17,6 +19,7 @@
 
 #include <QDebug>
 
+#include "MainFloatingWindow.h"
 #include "TextReplaceRuleListView.h"
 
 #if !defined STR
@@ -31,17 +34,24 @@ MainDialog::MainDialog(QWidget* parent)
     : QDialog(parent)
     , ui(new Ui::MainDialog)
     , cb(QGuiApplication::clipboard())
+    , _M_tray(new QSystemTrayIcon(QIcon(":/Icon/MainIcon.ico"), this))
     , _M_replacer(new huanhuan::TextReplacer())
 {
     ui->setupUi(this);
     
-    // Set title and windows flags
-    setWindowTitle(tr("The Clipboard Filter %0, Hello @%1").arg(STRVALUE(__VERSION__)).arg(QDir::home().dirName()));
+    // Set windows flags
     setWindowFlags(Qt::CustomizeWindowHint);
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
     
     // Create title bar
-    _M_ui_titlebar = new TitleBar(this);
+    _M_ui_titlebar = new TitleBar(
+                this,
+                tr("ClipboardFilter %0, @%1")
+                    .arg(STRVALUE(__VERSION__))
+                    .arg(QDir::home().dirName()),
+                new MainFloatingWindow(this));
+    
+    connect(qobject_cast<MainFloatingWindow*>(_M_ui_titlebar->floatingWindow()), &MainFloatingWindow::iconClicked, _M_ui_titlebar, &TitleBar::switchToMainWindow);
     
     // Set the font of the `Copyright`
     QFont itFont(ui->labelCopyright->font());
@@ -52,7 +62,12 @@ MainDialog::MainDialog(QWidget* parent)
     // If the connection type is not set to Qt::QueuedConnection,
     // then dataChanged() will be sent one additional time and
     // the clipboard will be set to empty.
-    connect(cb, &QClipboard::dataChanged, this, &MainDialog::on_clipboardChange, Qt::QueuedConnection);
+    connect(cb, &QClipboard::dataChanged, this, &MainDialog::onClipboardDataChanged, Qt::QueuedConnection);
+    
+    huanhuan::VariableParser::global()->setOnFailure(&MainDialog::variableParsingFailed);
+    
+    // Configure to taskbar tray
+    initTray();
     
     // Configure logBrowser
     initLogBrowser();
@@ -87,8 +102,8 @@ void MainDialog::updateClipboard()
         return;
     }
     
-    QString text = cb->text();
-    if (text.isEmpty())
+    _M_replacer->buffer() = cb->text();
+    if (_M_replacer->buffer().isEmpty())
     {
         return;
     }
@@ -107,14 +122,9 @@ void MainDialog::updateClipboard()
         QString csText = ui->characterListBox->text();
         if (ui->enableVariablesCheckBox->isChecked())
         {
-            auto error_func = [](QStringView variable, const char* what) -> void
-            {
-                huanhuan::slog << tr("From variable ${ %0 }: %1").arg(variable).arg(what);
-            };
-            
             try
             {
-                csText = _M_replacer->variableParser().parse(csText, error_func);
+                csText = _M_replacer->variableParser()->parse(csText);
             }
             catch (const std::exception& e)
             {
@@ -130,15 +140,17 @@ void MainDialog::updateClipboard()
     
     if (before)
     {
-        text = _M_replacer->filter(text, cs);
+        _M_replacer->buffer() = _M_replacer->filter(_M_replacer->buffer(), cs);
     }
     
-    cb->setText(_M_ui_replacementListView->filter(text));
+    _M_ui_replacementListView->filter(_M_replacer->buffer());
     
     if (after)
     {
-        text = _M_replacer->filter(text, cs);
+        _M_replacer->buffer() = _M_replacer->filter(_M_replacer->buffer(), cs);
     }
+    
+    cb->setText(_M_replacer->buffer());
     
     ui->labelStatusBar->setState(StatusBarLabel::Status::Replaced);
 }
@@ -211,6 +223,53 @@ void MainDialog::saveConfigure() const
     }
 }
 
+void MainDialog::initTray()
+{
+    QMenu* menu = new QMenu(this);
+    
+    QAction* action;
+    
+    action = new QAction(tr("Version ") + STRVALUE(__VERSION__), this);
+    action->setEnabled(false);
+    menu->addAction(action);
+    
+    action = new QAction(tr("By huanhuanonly"), this);
+    connect(action, &QAction::triggered, this, []() -> void
+    {
+        QDesktopServices::openUrl(QUrl("https://github.com/huanhuanonly"));
+    });
+    menu->addAction(action);
+    
+    menu->addSeparator();
+    
+    action = new QAction(tr("Github"), this);
+    connect(action, &QAction::triggered, this, []() -> void
+    {
+        QDesktopServices::openUrl(QUrl("https://github.com/huanhuanonly/ClipboardFilter"));
+    });
+    menu->addAction(action);
+    
+    action = new QAction(tr("View Configuration file"), this);
+    connect(action, &QAction::triggered, this, []() -> void
+    {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QDir::tempPath() + R"(/ClipboardFilter.ini)"));
+    });
+    menu->addAction(action);
+    
+    action = new QAction(tr("Exit"), this);
+    connect(action, &QAction::triggered, this, []() -> void
+    {
+        QApplication::exit(0);
+    });
+    menu->addAction(action);
+    
+    menu->setAttribute(Qt::WA_TranslucentBackground);
+    menu->setWindowFlag(Qt::FramelessWindowHint, true);
+    
+    _M_tray->setContextMenu(menu);
+    _M_tray->show();
+}
+
 void MainDialog::initLogBrowser()
 {
     ui->logBrowser->document()->setMaximumBlockCount(huanhuan::slog.maxSize());
@@ -267,7 +326,7 @@ void MainDialog::initLogBrowser()
     ui->groupBox_logger->hide();
 }
 
-void MainDialog::on_clipboardChange()
+void MainDialog::onClipboardDataChanged()
 {
     if (_M_clipboard_flag == true)
     {
@@ -291,15 +350,17 @@ void MainDialog::on_stateButton_clicked()
     if (state == RunState::Running)
     {
         ui->stateButton->setText(tr("&Start"));
-        disconnect(cb, &QClipboard::dataChanged, this, &MainDialog::on_clipboardChange);
+        disconnect(cb, &QClipboard::dataChanged, this, &MainDialog::onClipboardDataChanged);
         state = RunState::Stopping;
+        emit runningChanged(false);
     }
     // Start
     else
     {
         ui->stateButton->setText(tr("&Stop"));
-        connect(cb, &QClipboard::dataChanged, this, &MainDialog::on_clipboardChange, Qt::QueuedConnection);
+        connect(cb, &QClipboard::dataChanged, this, &MainDialog::onClipboardDataChanged, Qt::QueuedConnection);
         state = RunState::Running;
+        emit runningChanged(true);
     }
     return;
 }
@@ -307,7 +368,8 @@ void MainDialog::on_stateButton_clicked()
 void MainDialog::on_resetButton_clicked()
 {
     ui->characterListBox->clear();
-    ui->beforeButton->setChecked(true);
+    ui->beforeButton->setChecked(false);
+    ui->afterButton->setChecked(true);
     ui->enableVariablesCheckBox->setChecked(false);
     
     int lineCount = _M_ui_replacementListView->model()->rowCount();
@@ -365,7 +427,7 @@ void MainDialog::on_parseButton_clicked()
         
         try
         {
-            text = _M_replacer->variableParser().parse(text, &variableParsingFailed);
+            text = _M_replacer->variableParser()->parse(text);
         }
         catch (const std::exception& e)
         {

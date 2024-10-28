@@ -13,6 +13,7 @@ CONFIG += c++17
 
 SOURCES += \
     src/Logger.cpp \
+    src/MainFloatingWindow.cpp \
     src/TextReplaceRuleListView.cpp \
     src/VariableParser.cpp \
     src/main.cpp \
@@ -21,7 +22,10 @@ SOURCES += \
 INCLUDEPATH += include
 
 HEADERS += \
+    include/ClickableLabel.h \
+    include/Exception.h \
     include/Logger.h \
+    include/MainFloatingWindow.h \
     include/StatusBarLabel.h \
     include/TextEditWithVariables.h \
     include/TextReplaceRuleListView.h \
@@ -47,15 +51,20 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 TARGET = "ClipboardFilter"
 
-VERSION = 1.1.1
-DEFINES += __VERSION__=1.1.1 \
+VERSION = 1.1.2
+DEFINES += __VERSION__=1.1.2 \
+    SETTINGS__FLOATINGWINDOW_WIDTH=300 \
+    SETTINGS__FLOATINGWINDOW_HEIGHT=60 \
     SETTINGS__LOGGER_MAXCOUNT=520 \
     SETTINGS__LOGGER_OUTPUT__RESULT_OF_VARIABLES=true \
     SETTINGS__UPDATE_ON_STARTUP=false
 
+QMAKE_CXXFLAGS += -Wno-attributes
+QMAKE_CXXFLAGS += -Wno-switch
+
 QMAKE_TARGET_COMPANY = "YangHuanhuan"
 QMAKE_TARGET_PRODUCT = "ClipboardFilter"
-QMAKE_TARGET_DESCRIPTION = "ClipboardFilter"
+QMAKE_TARGET_DESCRIPTION = "The ClipboardFilter 1.1.2 By YangHuanhuan 3347484963@qq.com"
 QMAKE_TARGET_COPYRIGHT = "Copyright (c) 2023-2024 YangHuanhuan 3347484963@qq.com.  All rights reserved."
 RC_LANG = 0x0004
 

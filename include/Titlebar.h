@@ -4,7 +4,9 @@
  * @author YangHuanhuan (3347484963@qq.com)
  * 
  * @brief Customize the title bar to replace
- *        the system default title bar
+ *        the system default title bar.
+ *        
+ * @ingroup huanhuan::ui
  */
 
 #ifndef TITLEBAR_H
@@ -26,14 +28,16 @@ class TitleBar : public QWidget
     Q_OBJECT
     
 public:
-    explicit TitleBar(QWidget* parent, QString title = QString())
+    
+    TitleBar(QWidget* parent, QString title = QString(), QWidget* floatingWindow = nullptr)
         : QWidget(parent)
-        , fbColor(QColor(0xff, 0xff, 0xff), QColor(0x33, 0x33, 0x33))
-        , hLayout(new QHBoxLayout(this))
-        , titleLabel(new QLabel(this))
-        , opacitySlider(new QSlider(Qt::Orientation::Horizontal, this))
-        , topmostButton(new QPushButton(this))
-        , closeButton(new QPushButton(this))
+        , _M_fbColor(QColor(0xff, 0xff, 0xff), QColor(0x33, 0x33, 0x33))
+        , _M_titleLabel(new QLabel(this))
+        , _M_opacitySlider(new QSlider(Qt::Orientation::Horizontal, this))
+        , _M_shrinkButton(new QPushButton(this))
+        , _M_topmostButton(new QPushButton(this))
+        , _M_closeButton(new QPushButton(this))
+        , _M_floatingWindow(floatingWindow)
     {
         if (parent)
         {
@@ -42,130 +46,200 @@ public:
             parent->installEventFilter(this);
         }
         
-        this->setAttribute(Qt::WA_TranslucentBackground);
-        this->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
-        this->setFixedHeight(titlebarHeight);
+        setAttribute(Qt::WA_TranslucentBackground);
+        setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        setFixedHeight(_M_titlebarHeight);
         
-        titleLabel->setText(title.isEmpty() && parent != nullptr ? parent->windowTitle() : title);
-        titleLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter);
-        titleLabel->setMinimumHeight(titlebarHeight);
-        titleLabel->setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        _M_titleLabel->setText(title.isEmpty() && parent != nullptr ? parent->windowTitle() : title);
+        _M_titleLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter);
+        _M_titleLabel->setMinimumHeight(_M_titlebarHeight);
+        _M_titleLabel->setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         QPalette palette;
-        palette.setColor(QPalette::WindowText, fbColor.first);
-        titleLabel->setPalette(palette);
-        titleLabel->setStyleSheet(R"(background-color: transparent; font-weight: 700;)");
+        palette.setColor(QPalette::WindowText, _M_fbColor.first);
+        _M_titleLabel->setPalette(palette);
+        _M_titleLabel->setStyleSheet(R"(background-color: transparent; font-weight: 700;)");
         
-        opacitySlider->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
-        opacitySlider->setMinimum(30);
-        opacitySlider->setMaximum(100);
-        opacitySlider->setValue(100);
-        opacitySlider->setStyleSheet(R"(background-color: transparent)");
+        _M_opacitySlider->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+        _M_opacitySlider->setMinimum(30);
+        _M_opacitySlider->setMaximum(100);
+        _M_opacitySlider->setValue(100);
+        _M_opacitySlider->setStyleSheet(R"(background-color: transparent)");
         
-        if (parent)
-        connect(opacitySlider, &QSlider::sliderMoved, this, [parent](int value)
+        if (parent) [[likely]]
         {
-            parent->setWindowOpacity(double(value) / 100);
-        });
+            connect(_M_opacitySlider, &QSlider::sliderMoved, this, [parent](int value)
+            {
+                parent->setWindowOpacity(static_cast<qreal>(value) / 100);
+            });
+        }
         
-        topmostButton->setFixedSize(titlebarHeight, titlebarHeight);
-        closeButton->setFixedSize(titlebarHeight, titlebarHeight);
+        _M_shrinkButton->setFixedSize(_M_titlebarHeight, _M_titlebarHeight);
+        _M_topmostButton->setFixedSize(_M_titlebarHeight, _M_titlebarHeight);
+        _M_closeButton->setFixedSize(_M_titlebarHeight, _M_titlebarHeight);
         
-        opacitySlider->setToolTip(tr("Opacity Slider"));
-        topmostButton->setToolTip(tr("Topmost"));
-        closeButton->setToolTip(tr("Close"));
+        _M_opacitySlider->setToolTip(tr("Opacity Slider"));
+        _M_shrinkButton->setToolTip(tr("Shrink to floating window"));
+        _M_topmostButton->setToolTip(tr("Topmost"));
+        _M_closeButton->setToolTip(tr("Close"));
         
-        topmostButton->setIcon(QIcon(QPixmap(":/Icon/topmost.svg").scaled(titlebarHeight, titlebarHeight)));
-        closeButton->setIcon(QIcon(QPixmap(":/Icon/exit.svg").scaled(titlebarHeight, titlebarHeight)));
+        _M_shrinkButton->setIcon(QIcon(QPixmap(":/Icon/shrink.svg").scaled(_M_titlebarHeight, _M_titlebarHeight)));
+        _M_topmostButton->setIcon(QIcon(QPixmap(":/Icon/topmost.svg").scaled(_M_titlebarHeight, _M_titlebarHeight)));
+        _M_closeButton->setIcon(QIcon(QPixmap(":/Icon/exit.svg").scaled(_M_titlebarHeight, _M_titlebarHeight)));
         
-        topmostButton->setFlat(true);
-        closeButton->setFlat(true);
+        _M_topmostButton->setFlat(true);
+        _M_closeButton->setFlat(true);
         
-        connect(topmostButton, &QPushButton::clicked, this, &TitleBar::onTopmostButtonClicked);
-        connect(closeButton, &QPushButton::clicked, this, &TitleBar::onCloseButtonClicked);
+        connect(_M_shrinkButton, &QPushButton::clicked, this, &TitleBar::onShrinkButtonClicked);
+        connect(_M_topmostButton, &QPushButton::clicked, this, &TitleBar::onTopmostButtonClicked);
+        connect(_M_closeButton, &QPushButton::clicked, this, &TitleBar::onCloseButtonClicked);
         
-        hLayout->addWidget(titleLabel);
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
         
-        hLayout->addWidget(opacitySlider);
+        hLayout->addWidget(_M_titleLabel);
         
-        hLayout->addWidget(topmostButton);
-        hLayout->addWidget(closeButton);
+        hLayout->addWidget(_M_opacitySlider);
+        
+        hLayout->addWidget(_M_shrinkButton);
+        hLayout->addWidget(_M_topmostButton);
+        hLayout->addWidget(_M_closeButton);
         
         hLayout->setSpacing(5);
         hLayout->setContentsMargins(5, 0, 0, 0);
         
-        this->setLayout(hLayout);
-        this->setStyleSheet(R"(border: none;)");
+        setLayout(hLayout);
+        setStyleSheet(R"(border: none;)");
     }
     
+    virtual ~TitleBar()
+    {
+        if (_M_floatingWindow) [[likely]]
+        {
+            _M_floatingWindow->deleteLater();
+        }
+    }
+    
+    TitleBar& operator=(const TitleBar&) = delete;
+    TitleBar& operator=(TitleBar&&) = delete;
+    
 public slots:
+    
     void setTitle(const QString& title)
     {
-        titleLabel->setText(title);
+        _M_titleLabel->setText(title);
     }
     
 public:
-    QString title() const
+    
+    [[nodiscard]] QString title() const
     {
-        return titleLabel->text();
+        return _M_titleLabel->text();
     }
     
     void setColor(const QPair<QColor, QColor>& color)
     {
-        fbColor = color;
+        _M_fbColor = color;
         update();
-    }
-    void setForegroundColor(const QColor& foreground)
-    {
-        fbColor.first = foreground;
-        update();
-    }
-    void setBackgroundColor(const QColor& background)
-    {
-        fbColor.second = background;
-        update();
-    }
-    QPair<QColor, QColor> color() const
-    {
-        return fbColor;
     }
     
-private:
+    void setForegroundColor(const QColor& foreground)
+    {
+        _M_fbColor.first = foreground;
+        update();
+    }
+    
+    void setBackgroundColor(const QColor& background)
+    {
+        _M_fbColor.second = background;
+        update();
+    }
+    
+    [[nodiscard]] QPair<QColor, QColor> color() const noexcept
+    {
+        return _M_fbColor;
+    }
+    
+    void setFloatingWindow(QWidget* widget) noexcept
+    {
+        _M_floatingWindow = widget;
+    }
+    
+    [[nodiscard]] QWidget* floatingWindow() const noexcept
+    {
+        return _M_floatingWindow;
+    }
+    
+public slots:
+    
+    void switchToMainWindow()
+    {
+        QWidget* p = parentWidget();
+        
+        if (p != nullptr) [[likely]]
+        {
+            p->show();
+        }
+        
+        if (_M_floatingWindow != nullptr) [[likely]]
+        {
+            _M_floatingWindow->hide();
+        }
+    }
+    
+protected:
+    
     void paintEvent(QPaintEvent* e) override
     {
         QPainter painter(this);
-        painter.fillRect(e->rect(), fbColor.second);
+        painter.fillRect(e->rect(), _M_fbColor.second);
         
         QWidget::paintEvent(e);
     }
+    
     void mousePressEvent(QMouseEvent* e) override
     {
-        moving = true;
-        movingStart = e->globalPos();
+        _M_moving = true;
+        _M_lastMousePos = e->globalPos();
         QWidget::mousePressEvent(e);
     }
+    
     void mouseMoveEvent(QMouseEvent* e) override
     {
-        if (moving)
+        if (_M_moving)
         {
-            QPoint movePoint = e->globalPos() - movingStart;
+            QPoint movePoint = e->globalPos() - _M_lastMousePos;
             QPoint widgetPos = this->parentWidget()->pos();
-            movingStart = e->globalPos();
+            _M_lastMousePos = e->globalPos();
             this->parentWidget()->move(widgetPos.x() + movePoint.x(), widgetPos.y() + movePoint.y());
         }
         QWidget::mouseMoveEvent(e);
     }
+    
     void mouseReleaseEvent(QMouseEvent* e) override
     {
-        moving = false;
+        _M_moving = false;
         QWidget::mouseReleaseEvent(e);
     }
     
 signals:
-    void iconClicked();
+    
+    void shrinkButtonClicked();
     void topmostButtonClicked(bool isTopmost);
     void closeButtonClicked();
     
 private slots:
+    
+    void onShrinkButtonClicked()
+    {
+        QWidget* p = parentWidget();
+        
+        if (p != nullptr) [[likely]]
+        {
+            p->hide();
+        }
+        
+        _M_floatingWindow->show();
+    }
+    
     void onTopmostButtonClicked()
     {
         bool isTopmost = this->parentWidget()->windowFlags() & Qt::WindowType::WindowStaysOnTopHint;
@@ -175,16 +249,16 @@ private slots:
             this->parentWidget()->setWindowFlags(
                 this->parentWidget()->windowFlags() &~ Qt::WindowType::WindowStaysOnTopHint);
             
-            topmostButton->setIcon(QIcon(QPixmap(":/Icon/topmost.svg").scaled(titlebarHeight, titlebarHeight)));
-            topmostButton->setToolTip(tr("Topmost"));
+            _M_topmostButton->setIcon(QIcon(QPixmap(":/Icon/topmost.svg").scaled(_M_titlebarHeight, _M_titlebarHeight)));
+            _M_topmostButton->setToolTip(tr("Topmost"));
         }
         else
         {
             this->parentWidget()->setWindowFlags(
                 this->parentWidget()->windowFlags() | Qt::WindowType::WindowStaysOnTopHint);
             
-            topmostButton->setIcon(QIcon(QPixmap(":/Icon/topmost2.svg").scaled(titlebarHeight, titlebarHeight)));
-            topmostButton->setToolTip(tr("Cancel topmost"));
+            _M_topmostButton->setIcon(QIcon(QPixmap(":/Icon/topmost2.svg").scaled(_M_titlebarHeight, _M_titlebarHeight)));
+            _M_topmostButton->setToolTip(tr("Cancel topmost"));
         }
         this->parentWidget()->show();
         
@@ -198,20 +272,22 @@ private slots:
     }
     
 private:
-    bool moving = false;
-    QPoint movingStart;
     
-    int titlebarHeight = 40;
-    QPair<QColor, QColor> fbColor;
+    QPoint _M_lastMousePos;
+    bool _M_moving = false;
     
-    QHBoxLayout* hLayout;
+    int _M_titlebarHeight = 40;
+    QPair<QColor, QColor> _M_fbColor;
     
-    QLabel* titleLabel;
+    QLabel* _M_titleLabel;
     
-    QSlider* opacitySlider;
+    QSlider* _M_opacitySlider;
     
-    QPushButton* topmostButton;
-    QPushButton* closeButton;
+    QPushButton* _M_shrinkButton;
+    QPushButton* _M_topmostButton;
+    QPushButton* _M_closeButton;
+    
+    QWidget* _M_floatingWindow;
 };
 
 #endif // TITLEBAR_H

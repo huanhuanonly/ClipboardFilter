@@ -5,6 +5,8 @@
  * 
  * @brief QTextEdit with additional support for variables
  * 
+ * @ingroup huanhuan::ui
+ * 
  * @include
  *     @class TextEditWithVariables
  *     
@@ -31,25 +33,24 @@ class TextEditWithVariables : public QTextEdit
     
 public:
     
-    TextEditWithVariables(QWidget* parent = nullptr)
+    TextEditWithVariables(const huanhuan::VariableParser* parser, QWidget* parent = nullptr)
         : QTextEdit(parent)
     {
-        QStringList list, list2;
+        QStringList listForCompleter;
         
-        for (const auto& [name, ptr] : huanhuan::VariableParser::predefinedVariables)
+        const_cast<huanhuan::VariableParser*>(parser)->forEach([&](const QString& name, std::function<QString(QStringView, int)>&) -> void
         {
-            list.append(QString("${%0}").arg(name));
-            list2.append(QString(name).toLower());
-        }
+            listForCompleter.append(QString("${%0}").arg(name));
+        });
         
-        _M_completer = new QCompleter(list, this);
+        _M_completer = new QCompleter(listForCompleter, this);
         
         _M_completer->setWidget(this);
         _M_completer->setCompletionMode(QCompleter::CompletionMode::PopupCompletion);
         _M_completer->setCaseSensitivity(Qt::CaseInsensitive);
         _M_completer->setFilterMode(Qt::MatchContains);
         
-        _M_variablesShader = new VariablesShader(list2, document());
+        _M_variablesShader = new VariablesShader(parser, document());
     }
     
     void enableVariables()
@@ -158,6 +159,7 @@ private:
     VariablesShader* _M_variablesShader;
 };
 
+// For .ui file
 class LineEditWithVariables : public QLineEdit
 {
     Q_OBJECT
@@ -167,10 +169,13 @@ public:
     LineEditWithVariables(QWidget* parent = nullptr)
         : QLineEdit(parent)
     {
-        for (const auto& [name, ptr] : huanhuan::VariableParser::predefinedVariables)
-        {
-            _M_list.append(QString("${%0}").arg(name));
-        }
+        // Note: The global VariableParser is used here!
+        
+        huanhuan::VariableParser::global()->forEach(
+            [&](const QString& name, std::function<QString(QStringView, int)>&) -> void
+            {
+                _M_list.append(QString("${%0}").arg(name));
+            });
     }
     
     void enableVariables()

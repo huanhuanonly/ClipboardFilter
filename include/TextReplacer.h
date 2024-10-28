@@ -6,6 +6,8 @@
  * @brief Parse and replace variables in
  *        text, and perform text replacement
  * 
+ * @ingroup huanhuan
+ * 
  * @include
  *     @namespace huanhuan
  *         @class TextReplacer
@@ -32,11 +34,13 @@ class TextReplacer
 {
 public:
     
-    enum class MatchOptions: int
+    enum MatchOptions: int
     {
-        None = 0,
-        Wildcard,
-        Regexp
+        CaseSensitive = 0b000,
+        CaseInsensitive = 0b001,
+        
+        Wildcard = 0b010,
+        Regex = 0b100
     };
     
     struct Rule
@@ -50,13 +54,14 @@ public:
         explicit Rule() = default;
         
         Rule(
-            const QString& __text,
             const QString& __pattern,
-            bool __escapeText,
-            bool __escapePattern,
+            const QString& __replacement,
+            bool __patternEnableVariables,
+            bool __replacementEnableVariables,
             MatchOptions __matchingOptions)
-                : pattern(__text), replacement(__pattern)
-                , patternEnableVariables(__escapeText), replacementEnableVariables(__escapePattern)
+                : pattern(__pattern), replacement(__replacement)
+                , patternEnableVariables(__patternEnableVariables)
+                , replacementEnableVariables(__replacementEnableVariables)
                 , matchOptions(__matchingOptions) { }
         
         
@@ -67,13 +72,37 @@ public:
     
 public:
     
-    inline TextReplacer& setVariableParser(const VariableParser& __parser)
+    explicit TextReplacer(VariableParser* const __parser = VariableParser::global())
+        : _M_parser(__parser)
     {
-        _M_parser = __parser;
-        return *this;
+        _M_parser->insert("parse", [__parser](QStringView __param, int) -> QString
+        {
+            if (__param.isEmpty())
+                throw VariableParser::InvalidArgumentException(VariableParser::get(VariableParser::EmptyArgument));
+            
+            return __parser->parse(__param);
+        });
+        
+        _M_parser->insert("buffer", [this](QStringView, int) -> QString
+        {
+            return _M_buffer;
+        });
     }
     
-    inline constexpr VariableParser& variableParser() noexcept
+    virtual ~TextReplacer()
+    {
+        if (_M_parser != VariableParser::global())
+        {
+            delete _M_parser;
+        }
+    }
+    
+    inline void setVariableParser(VariableParser* const __parser)
+    {
+        _M_parser = __parser;
+    }
+    
+    inline constexpr VariableParser* variableParser() noexcept
     {
         return _M_parser;
     }
@@ -89,7 +118,7 @@ public:
         return _M_rule;
     }
     
-    QString replace(const QString& __text, const std::function<void(QStringView, const char*)>& __callback = &VariableParser::defaultExceptionCallbackFunction) const
+    QString replace(const QString& __text) const
     {
         QString res = __text;
         
@@ -98,7 +127,7 @@ public:
         
         if (_M_rule.patternEnableVariables)
         {
-            text = _M_parser.parse(_M_rule.pattern, __callback);
+            text = _M_parser->parse(_M_rule.pattern);
         }
         else
         {
@@ -107,7 +136,7 @@ public:
         
         if (_M_rule.replacementEnableVariables)
         {
-            pattern = _M_parser.parse(_M_rule.replacement, __callback);
+            pattern = _M_parser->parse(_M_rule.replacement);
         }
         else
         {
@@ -116,22 +145,46 @@ public:
         
         switch (_M_rule.matchOptions)
         {
-            case MatchOptions::None:
+            case MatchOptions::CaseSensitive:
             {
-                res.replace(_M_rule.pattern, pattern);
+                res.replace(text, pattern, Qt::CaseSensitive);
+                break;
+            }
+            
+            case MatchOptions::CaseInsensitive:
+            {
+                res.replace(text, pattern, Qt::CaseInsensitive);
                 break;
             }
             
             case MatchOptions::Wildcard:
             {
-                QRegExp regex(_M_rule.pattern, Qt::CaseSensitive, QRegExp::Wildcard);
+                QRegExp regex(text, Qt::CaseSensitive, QRegExp::Wildcard);
+                regex.setMinimal(true);
                 res.replace(regex, pattern);
                 break;
             }
             
-            case MatchOptions::Regexp:
+            case MatchOptions::Wildcard | MatchOptions::CaseInsensitive:
             {
-                QRegExp regex(_M_rule.pattern, Qt::CaseSensitive, QRegExp::RegExp2);
+                QRegExp regex(text, Qt::CaseInsensitive, QRegExp::Wildcard);
+                regex.setMinimal(true);
+                res.replace(regex, pattern);
+                break;
+            }
+            
+            case MatchOptions::Regex:
+            {
+                QRegExp regex(text, Qt::CaseSensitive, QRegExp::RegExp2);
+                regex.setMinimal(true);
+                res.replace(regex, pattern);
+                break;
+            }
+            
+            case MatchOptions::Regex | MatchOptions::CaseInsensitive:
+            {
+                QRegExp regex(text, Qt::CaseInsensitive, QRegExp::RegExp2);
+                regex.setMinimal(true);
                 res.replace(regex, pattern);
                 break;
             }
@@ -155,10 +208,16 @@ public:
         return res;
     }
     
+    constexpr inline QString& buffer() noexcept
+    {
+        return _M_buffer;
+    }
+    
 private:
     
     Rule _M_rule;
-    VariableParser _M_parser;
+    VariableParser* _M_parser;
+    QString _M_buffer;
 };
 
 } // namespace huanhuan

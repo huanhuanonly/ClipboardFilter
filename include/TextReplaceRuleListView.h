@@ -6,6 +6,8 @@
  * @brief Custom QTableView,
  *        Used to set multiple replacement rules
  * 
+ * @ingroup huanhuan::ui
+ * 
  * @include
  *     @class TextReplaceRuleListModel
  *     @class TextReplaceRuleListStyledItemDelegate
@@ -109,34 +111,27 @@ public:
     dataList() const noexcept;
     
     
-    constexpr inline const QStringList&
-    headerStringList() const noexcept
+    static inline QStringList
+    headerStringList() noexcept
     {
-        return _M_headerStringList;
+        static QStringList list { tr("Pattern"), tr("EnVars"), tr("Replacement"), tr("EnVars"), tr("MatchOptions") };
+        return list;
     }
     
-    
-    constexpr inline const QStringList&
-    matchOptionsStringList() const noexcept
+    static inline QMap<MatchOptions, QString>
+    matchOptionsStringMap() noexcept
     {
-        return _M_matchOptionsStringList;
+        static QMap<MatchOptions, QString> map{
+            { MatchOptions::CaseSensitive,  tr("CaseSensitive") },
+            { MatchOptions::CaseInsensitive, tr("CaseInsensitive") },
+            { MatchOptions(MatchOptions::Wildcard | MatchOptions::CaseSensitive), tr("Wildcard, CaseSensitive") },
+            { MatchOptions(MatchOptions::Wildcard | MatchOptions::CaseInsensitive), tr("Wildcard, CaseInsensitive") },
+            { MatchOptions(MatchOptions::Regex | MatchOptions::CaseSensitive), tr("Regex, CaseSensitive") },
+            { MatchOptions(MatchOptions::Regex | MatchOptions::CaseInsensitive), tr("Regex, CaseInsensitive") }
+        };
+        
+        return map;
     }
-    
-private:
-    
-    QStringList _M_headerStringList =
-    {
-        tr("Pattern"),
-        tr("EnVars"),
-        tr("Replacement"),
-        tr("EnVars"),
-        tr("MatchOptions")
-    };
-    
-    QStringList _M_matchOptionsStringList =
-    {
-        tr("None"), tr("Wildcard"), tr("Regex")
-    };
 };
 
 class TextReplaceRuleListStyledItemDelegate : public QStyledItemDelegate
@@ -145,8 +140,8 @@ class TextReplaceRuleListStyledItemDelegate : public QStyledItemDelegate
     
 public:
     
-    TextReplaceRuleListStyledItemDelegate(QObject* parent = nullptr)
-        : QStyledItemDelegate(parent)
+    TextReplaceRuleListStyledItemDelegate(const huanhuan::VariableParser* parser, QObject* parent = nullptr)
+        : QStyledItemDelegate(parent), _M_parser(parser)
     { }
     
     
@@ -189,6 +184,10 @@ private slots:
         emit commitData(qobject_cast<QWidget*>(sender()));
         emit closeEditor(qobject_cast<QWidget*>(sender()));
     }
+    
+private:
+    
+    const huanhuan::VariableParser* _M_parser;
 };
 
 class TextReplaceRuleListView : public QTableView
@@ -217,12 +216,12 @@ public:
     removeRow(int pos);
     
     
-    QString&
-    filter(QString& text, const DataType& data);
+    void
+    filter(const QString& text, const DataType& data);
     
     
-    QString&
-    filter(QString& text);
+    QString
+    filter(const QString& text);
     
 private:
     

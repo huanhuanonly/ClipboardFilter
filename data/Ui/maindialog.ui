@@ -82,7 +82,12 @@ QHeaderView::section
 }
 QTableView::item
 {
+	selection-color: rgb(255, 255, 255);
     selection-background-color: rgb(30, 60, 90);
+}
+QTableCornerButton::section
+{
+	background-color: rgb(71, 69, 0);
 }
 
 QSlider::handle
@@ -106,17 +111,42 @@ QSlider::sub-page
 
 QMenu
 {
-	background-color: rgb(0, 0, 0);
+	border: 1px solid rgb(58, 255, 71);
+	border-radius: 10px;
 	color: rgb(255, 255, 255);
+	background-color: rgba(0, 0, 0, 150);
+}
+QMenu::item
+{
+	padding: 3px 10px;
+	background-color: transparent;
 }
 QMenu::item:selected
 {
 	border: 1px solid rgb(0, 255, 255);
 	border-radius: 5px;
+	color: rgb(0, 255, 255);
+	background-color: rgb(48, 48, 48);
+}
+QMenu::item:pressed
+{
+	padding: 8px 8px;
+	background-color: rgb(92, 171, 159);
 }
 QMenu::item:!enabled
 {
 	color: rgb(109, 109, 109);
+}
+QMenu::item:!enabled:selected
+{
+	color: rgb(0, 155, 155);
+	background-color: rgb(48, 48, 48);
+}
+QMenu::separator
+{
+	background-color: rgba(255, 255, 255, 0.3);
+	height: 1px;
+	margin: 6px 0;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -353,7 +383,7 @@ QLineEdit:focus
       <item>
        <widget class="QLabel" name="labelCopyright">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;The ClipboardFilter&lt;/span&gt;, by &lt;span style=&quot; font-style:italic;&quot;&gt;YangHuanhuan&lt;/span&gt;&lt;/p&gt;&lt;p&gt;in &lt;span style=&quot; text-decoration: underline;&quot;&gt;December 2023&lt;/span&gt; for &lt;span style=&quot; font-style:italic;&quot;&gt;YuFeixia&lt;/span&gt;. All rights reserved.&lt;/p&gt;&lt;p&gt;Last update in &lt;span style=&quot; text-decoration: underline;&quot;&gt;September 2024&lt;/span&gt;&lt;/p&gt;&lt;p&gt;---&lt;/p&gt;&lt;p&gt;E-mail: &lt;span style=&quot; font-weight:700;&quot;&gt;3347484963@qq.com &lt;/span&gt;or&lt;span style=&quot; font-weight:700;&quot;&gt; huanhuanonly@gmail.com&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Github: &lt;a href=&quot;https://github.com/huanhuanonly/ClipboardFilter&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline; color:#8ab4f8;&quot;&gt;https://github.com/huanhuanonly/ClipboardFilter&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;The ClipboardFilter&lt;/span&gt;, by &lt;span style=&quot; font-style:italic;&quot;&gt;YangHuanhuan&lt;/span&gt;&lt;/p&gt;&lt;p&gt;in &lt;span style=&quot; text-decoration: underline;&quot;&gt;December 2023&lt;/span&gt; for &lt;span style=&quot; font-style:italic;&quot;&gt;YuFeixia&lt;/span&gt;. All rights reserved.&lt;/p&gt;&lt;p&gt;Last update in &lt;span style=&quot; text-decoration: underline;&quot;&gt;October 2024&lt;/span&gt;&lt;/p&gt;&lt;p&gt;---&lt;/p&gt;&lt;p&gt;E-mail: &lt;span style=&quot; font-weight:700;&quot;&gt;3347484963@qq.com &lt;/span&gt;or&lt;span style=&quot; font-weight:700;&quot;&gt; huanhuanonly@gmail.com&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Github: &lt;a href=&quot;https://github.com/huanhuanonly/ClipboardFilter&quot;&gt;&lt;span style=&quot; font-weight:700; text-decoration: underline; color:#8ab4f8;&quot;&gt;https://github.com/huanhuanonly/ClipboardFilter&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="toolTipDuration">
          <number>10000</number>

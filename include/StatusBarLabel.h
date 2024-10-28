@@ -4,7 +4,9 @@
  * @author YangHuanhuan (3347484963@qq.com)
  * 
  * @brief StatusBarLabel for MainDialog,
- *        display current working status
+ *        display current working status.
+ * 
+ * @ingroup huanhuan::ui
  * 
  * @include
  *     @class StatusBarLabel
@@ -18,8 +20,7 @@
 #include <QApplication>
 #include <QGuiApplication>
 #include <QClipboard>
-
-#include <map>
+#include <QMap>
 
 #include "Logger.h"
 
@@ -48,7 +49,7 @@ public:
         _M_state = __state;
         _M_resetText();
         
-        QString out = _M_map[__state];
+        QString out = _S_map[__state];
         
         if (_M_state == Status::Copied || _M_state == Status::Replaced)
         {
@@ -71,13 +72,20 @@ public:
             huanhuan::slog << huanhuan::endl;
         }
         
-        if (_M_state == Status::Replaced && _M_timerId == -1)
+        if (_M_state == Status::Replaced)
         {
+            if (_M_timerId != -1)
+            {
+                killTimer(_M_timerId);
+            }
+            
             _M_timerId = startTimer(2000);
         }
+        
+        emit stateChanged(__state);
     }
     
-    Status state() const noexcept
+    [[nodiscard]] Status state() const noexcept
     {
         return _M_state;
     }
@@ -99,6 +107,17 @@ public:
         }
     }
     
+    friend class MainFloatingWindow;
+    
+protected:
+    
+    static inline const QMap<Status, QString> _S_map {
+        { Status::Waiting, QObject::tr("Waiting") },
+        { Status::Copied, QObject::tr("Copied") },
+        { Status::Replacing, QObject::tr("Replacing") },
+        { Status::Replaced, QObject::tr("Replaced") }
+    };
+    
 private:
     
     void _M_resetText()
@@ -106,7 +125,7 @@ private:
         setText(QString("%0 %1 %2")
             .arg(R"-(<style type="text/css">a{text-decoration:none; color:%0;}</style>)-")
                 .arg(_M_more ? "#FF00FF" : "#00FFFF")
-            .arg(_M_map[_M_state])
+            .arg(_S_map[_M_state])
             .arg(tr(R"-(<a href="%0">%1</a>)-"))
                 .arg(_M_more ? "closeMore" : "openMore")
                 .arg(_M_more ? "...Less" : "More..."));
@@ -135,14 +154,9 @@ signals:
     void moreOpened();
     void moreClosed();
     
-private:
+    void stateChanged(Status);
     
-    static inline std::map<Status, QString> _M_map {
-        { Status::Waiting, QObject::tr("Waiting") },
-        { Status::Copied, QObject::tr("Copied") },
-        { Status::Replacing, QObject::tr("Replacing") },
-        { Status::Replaced, QObject::tr("Replaced") }
-    };
+private:
     
     Status _M_state = Status::Waiting;
     

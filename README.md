@@ -7,7 +7,7 @@
 
 ## Description
 
-> Monitor the clipboard, filter specified characters when the clipboard is written, and support regular expressions to replace matching text.
+> Monitor the clipboard, filter the specified characters when writing to the clipboard, and support **variable** and **regular expression** to replace the matched text.
 
 ## Update Log
 
@@ -27,9 +27,18 @@
 * **Fixed** an issue where variables were not being parsed in some controls;
 * **Added** `before` and `after` buttons;
 * **Cancel** the display of the date of each log in the log bar;
-* The result of variable parsing will be displayed in the log bar;
+* **Added** the result of variable parsing will be displayed in the log bar;
 * **Added** background color for icons;
 * **Release** version $\text{v}1.1.1$;
+
+### In End of October 2024
+* **Fixed** some bugs and logic vulnerabilities;
+* **Added** a small floating window;
+* **Added** a `shrink to floating window` button in the title bar;
+* **Improved** log output;
+* **Added** multiple variables for base conversion, text conversion, random selection, etc., and `parse`, `buffer`;
+* **Added** `MatchOptions` to choose whether to be case-sensitive;
+* **Released** version $\text{v}1.1.2$;
 
 ## Download
 
@@ -46,7 +55,7 @@ It is packaged using `Enigma Virtual Box`, and it's normal for the firewall to r
 
 ### Download the Unpackaged File
 
-You need to download all files in the `./bin/v1.1.1/` directory.
+You need to download all files in the `./bin/v1.1.2/` directory.
 
 ---
 
@@ -83,51 +92,16 @@ ${ variable-name [: parameter] }
 
 #### Built-in variables
 
-##### Get text from elsewhere
+##### Get External Text
+* `env`: Get an environment variable;
+  * `param`: The name of the environment variable to retrieve.
+  * For example: `${env:WINDIR}` might return `C:\WINDOWS`.
+* `file`: Get the text content from a file;
+  * `param`: The file path that includes the filename.
+  * For example: `${file:C:\file.txt}`, note that only the first `:` acts as a separator.
+* `clipboard`: Get text data from the clipboard (before replacement);
 
-* `env`: Get environment variables;
-  * `param`: The name of the environment variable to get.
-* `file`: Get the text content in a file;
-  * `param`: The filepath with the filename.
-* `clipboard`: Get the text data (raw) from the clipboard;
-
-* `escape`: Get the characters corresponding to C-style escape characters;
-  * `param`: C-style escape characters, For example, `\n` is a linebreak character.
-* `linebreak`: Alternatives to linebreaks;
-  * `param`: (_optional_) `CRLF` (define on **Windows**) or `LF` (define on Other systems).
-* `unicode`: Get the characters corresponding to **Unicode** code;
-  * `param`: A non-negative integer, Unicode code.
-
-##### Function variables
-
-* `random`: Get a random number (**integer**) in a specified range;
-  * `param`: (_optional_) There are the following two formats:
-    * `lowerBound, upperBound`: Return a random number in range $\left[lowerBound, upperBound\right]$.
-    * `upperBound`: Return a random number in range $\left[0, upperBound\right]$.
-  * For example:
-    * `${random}` Returns a 64-bit random number;
-    * `${random:-10,99}` Returns a random number between $-10$ and $99$ (inclusive);
-    * `${random:99}` Returns a random number between $0$ and $99$ (inclusive);
-* `index`: Returns the result of the previous call **plus one**. In addition, the first call returns the integer $1$.
-  * `param`: (_optional_) A string, Multiple indexers can be used.
-  * For example:
-    * `${index}, ${index} and ${index}` Return `1, 2 and 3`;
-    * `${index:a}, ${index:a} and ${index:b}` Return `1, 2 and 1`;
-    * `${index:a}, ${index:b}, ${index:a}, ${index:b}` Return `1, 1, 2, 2`;
-* `iota`: Returns a contiguous subsequence;
-  * `param`: A string, if both ends are numbers, return a sequence of numbers, otherwise return a sequence of characters;
-  * For example:
-    * `${iota:15}` Return `15`, A numeric sequence must be separated by _non-numeric_ characters, otherwise it will be considered a single number;
-    * `${iota:1-5}` Return `1-2-3-4-5`;
-    * `${iota:5-1}` Return `5-4-3-2-1`;
-    * `${iota:10+=13}` Return `10+=11+=12+=13`;
-    * `${iota:ae}` Return `abcde`;
-    * `${iota:a,e}` Return `a,b,c,d,e`;
-    * `${iota:e,a}` Return `e,d,c,b,a`;
-    * `${iota:aUc}` Return `aUbUc`, Except for the first and last characters, all other characters are considered separators;
-
-##### Current Time
-
+##### Get Current Time
 * `hour`
 * `minute`
 * `second`
@@ -137,8 +111,105 @@ ${ variable-name [: parameter] }
 * `day`
 * `week`
 * `date`
+  * `param`: (optional) format.
 * `time`
+  * `param`: (optional) format.
 * `datetime`
+  * `param`: (optional) format.
+
+##### Encode to Text
+* `escape`: Get the character corresponding to C-style escape sequences;
+  * `param`: C-style escape sequence, for example, `\n` is a newline.
+* `linebreak`: Alternative for newline;
+  * `param`: (optional) `CRLF` (default on **Windows**) or `LF` (default on other systems).
+* `unicode`: Get the character corresponding to **Unicode** encoding;
+  * `param`: A non-negative integer, Unicode encoding.
+
+##### Text to Encoding
+* `tounicode`: Input a string of text and convert it to Unicode codes, separated by spaces.
+  * `param`: Input text.
+  * For example: `${tounicode:abc}` returns `97 98 99`.
+* `tohtml`: Input a string of text and convert it to HTML escape sequences.
+  * `param`: Input text.
+  * For example: `${tohtml:<abc>}` returns `&lt;abc&gt;`.
+* `hex`: Input a non-negative integer and convert it to hexadecimal.
+  * `param`: Non-negative integer.
+  * For example: `${hex:5201314}` returns `4f5da2`.
+* `oct`: Same as above, convert to octal.
+* `bin`: Same as above, convert to binary.
+* `dec`: Same as above, convert to decimal.
+
+##### Dynamic Variables
+* `random`: Get a random number within a specified range (**integer**);
+  * `param`: (optional) Two formats:
+    * `lowerBound, upperBound`: Returns a random number in the range $\left[lowerBound, upperBound\right]$.
+    * `upperBound`: Returns a random number in the range $\left[0, upperBound\right]$.
+  * For example:
+    * `${random}` returns a $64$ bit random number;
+    * `${random:-10,99}` returns a random number in the range of $-10$ to $99$ (inclusive);
+    * `${random:99}` returns a random number in the range of $0$ to $99$ (inclusive).
+* `rsoc`: Short for `RandomlySelectOneChar`, randomly select one character.
+  * `param`: Character set.
+  * For example: `${rsoc:abc}` might return any of the characters `a`, `b`, or `c`.
+* `rsow`: Short for `RandomlySelectOneWord`, randomly select one word.
+  * `param`: Word set, can be separated by any English punctuation and whitespace.
+  * For example: `${rsow:like,love}` might return either `like` or `love`.
+* `rsol`: Short for `RandomlySelectOneLine`, randomly select one line.
+  * `param`: Line set, separated by newline characters.
+* `index`: Returns the last result **plus one**. The first call returns the integer $1$.
+  * `param`: (optional) a string, multiple indexers can be used.
+  * For example:
+    * `${index}, ${index} and ${index}` returns `1, 2 and 3`;
+    * `${index:a}, ${index:a} and ${index:b}` returns `1, 2 and 1`;
+    * `${index:a}, ${index:b}, ${index:a}, ${index:b}` returns `1, 1, 2, 2`.
+* `iota`: Returns a continuous subsequence;
+  * `param`: A string, if both ends are digits, returns a series of numbers, otherwise returns a series of characters;
+  * For example:
+    * `${iota:15}` returns `15`, numeric sequences must be separated by _non-numeric_ characters, or they will be treated as a single number;
+    * `${iota:1-5}` returns `1-2-3-4-5`;
+    * `${iota:5-1}` returns `5-4-3-2-1`;
+    * `${iota:10+=13}` returns `10+=11+=12+=13`;
+    * `${iota:ae}` returns `abcde`;
+    * `${iota:a,e}` returns `a,b,c,d,e`;
+    * `${iota:e,a}` returns `e,d,c,b,a`;
+    * `${iota:aUc}` returns `aUbUc`, treating all characters except the first and last as separators.
+
+##### Text Transformation
+* `shuffle`: Shuffle the order of the text.
+  * `param`: Text.
+  * For example: `${shuffle:ILoveYou}` might return `oYeLIuov`.
+* `sort`: Sort the text.
+  * `param`: Text.
+  * For example: `${sort:ILoveYou1314}` returns `1134ILYeoouv`.
+* `reverse`: Reverse the text.
+  * `param`: Text.
+  * For example: `${reverse:ILoveYou1314}` returns `4131uoYevoLI`.
+* `hash`: Map the text to a hexadecimal hash value based on the `md5` algorithm.
+  * `param`: Text.
+  * For example: `${hash:ILoveYou1314}` returns `c52393bda98d849cc966a830f17f4cab`.
+* `tolower`: Convert text to lowercase.
+  * `param`: Text.
+  * For example: `${tolower:ILoveYou1314}` returns `iloveyou1314`.
+* `toupper`: Convert text to uppercase.
+  * `param`: Text.
+  * For example: `${toupper:ILoveYou1314}` returns `ILOVEYOU1314`.
+* `trimmed`: Trim whitespace from both ends of the text.
+  * `param`: Text.
+  * For example: `${trimmed: ILoveYou1314 }` returns `ILoveYou1314`.
+* `simplified`: Trim whitespace from both ends and replace each sequence of internal spaces with a single space.
+  * `param`: Text.
+  * For example: `${simplified: I   Love You 1314 }` returns `I Love You 1314`.
+
+Here's the translation:
+
+##### Special Variables
+
+* `parse`: Parse variables within the text, supporting nesting.
+  * `param`: Text.
+  * For example: `${parse:${buffer}}`.
+* `buffer`: Get the text from the buffer.
+
+_After each rule replacement, the result is temporarily stored in the buffer. After all rule replacements are completed, the final result is written to the clipboard at once._
 
 ## Project Structure
 ```
@@ -147,6 +218,7 @@ ${ variable-name [: parameter] }
 │  ClipboardFilter.exe
 │  ClipboardFilter.pro
 │  ClipboardFilter.pro.user
+│  LICENSE
 │  README.md
 │  README_zh-CN.md
 │
@@ -159,8 +231,13 @@ ${ variable-name [: parameter] }
 │  │  │
 │  │  └─...
 │  │
-│  └─v1.1.1
-│      │  ClipboardFilter_1.1.1.exe
+│  ├─v1.1.1
+│  │  │   ClipboardFilter_1.1.1.exe
+│  │  │
+│  │  └─...
+│  │
+│  └─v1.1.2
+│      │  ClipboardFilter_1.1.2.exe
 │      │  
 │      └─...
 │
@@ -177,14 +254,17 @@ ${ variable-name [: parameter] }
 │  │      MainIcon.ico
 │  │      MainIcon.png
 │  │      MainIcon.svg
+│  │      shrink.svg
 │  │      topmost.svg
 │  │      topmost2.svg
 │  │
 │  ├─Screenshot
 │  │      home.png
+│  │      home_1.1.1.png
 │  │
 │  ├─Source
 │  │      MainIcon.ai
+│  │      Shrink.ai
 │  │
 │  ├─Ts
 │  │      ClipboardFilter_zh_CN.ts
@@ -193,8 +273,11 @@ ${ variable-name [: parameter] }
 │         maindialog.ui
 │
 ├─include
+│      ClickableLabel.h
+│      Exception.h
 │      Logger.h
-│      maindialog.h
+│      MainDialog.h
+│      MainFloatingWindow.h
 │      StatusBarLabel.h
 │      TextEditWithVariables.h
 │      TextReplacer.h
@@ -207,7 +290,8 @@ ${ variable-name [: parameter] }
 └─src
        Logger.cpp
        main.cpp
-       maindialog.cpp
+       MainDialog.cpp
+       MainFloatingWindow.cpp
        TextReplaceRuleListView.cpp
        VariableParser.cpp
 ```

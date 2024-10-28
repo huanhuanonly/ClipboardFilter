@@ -4,6 +4,8 @@
  * @author YangHuanhuan (3347484963@qq.com)
  * 
  * @brief Variable shader
+ * 
+ * @ingroup huanhuan::ui
  */
 
 #ifndef VARIABLESSHADER_H
@@ -18,19 +20,18 @@
 
 #include <algorithm>
 
+#include "VariableParser.h"
+
 class VariablesShader : public QSyntaxHighlighter
 {
     Q_OBJECT
     
 public:
     
-    VariablesShader(const QStringList& variables, QTextDocument* parent = nullptr)
+    VariablesShader(const huanhuan::VariableParser* variablesParser, QTextDocument* parent = nullptr)
         : QSyntaxHighlighter(parent)
-        , _M_variables(variables)
-    {
-        // Sort it for later use with binary search
-        std::sort(_M_variables.begin(), _M_variables.end());
-    }
+        , _M_parser(variablesParser)
+    { }
     
     void highlightBlock(const QString& text) override
     {
@@ -94,7 +95,7 @@ public:
                     
                     if (meet == false)
                     {
-                        if (std::binary_search(_M_variables.begin(), _M_variables.end(), ins.trimmed()))
+                        if (_M_parser->contains(ins.trimmed()))
                         {
                             setFormat(i - ins.size(), ins.size(), f_var_accept);
                         }
@@ -117,7 +118,7 @@ public:
                 {
                     meet = true;
                     
-                    if (std::binary_search(_M_variables.begin(), _M_variables.end(), ins.trimmed()))
+                    if (_M_parser->contains(ins.trimmed()))
                     {
                         setFormat(i - ins.size(), ins.size(), f_var_accept);
                     }
@@ -140,7 +141,7 @@ public:
     
 private:
     
-    QStringList _M_variables;
+    const huanhuan::VariableParser* _M_parser;
 };
 
 #endif // VARIABLESSHADER_H

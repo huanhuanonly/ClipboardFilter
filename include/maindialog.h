@@ -5,6 +5,8 @@
  * 
  * @brief Main UI
  * 
+ * @ingroup huanhuan::ui
+ * 
  * @include
  *     @class MainDialog
  */
@@ -16,6 +18,8 @@
 #include <QClipboard>
 #include <QApplication>
 #include <QStandardItemModel>
+#include <QSystemTrayIcon>
+#include <QDesktopServices>
 #include <QSet>
 
 #include "TextReplaceRuleListView.h"
@@ -43,6 +47,7 @@ public:
     
     void updateClipboard();
     
+    void initTray();
     void initLogBrowser();
     
     static void variableParsingFailed(QStringView variable, const char* what)
@@ -51,9 +56,16 @@ public:
                        << huanhuan::endl;
     }
     
+    friend class MainFloatingWindow;
+    
+signals:
+    
+    void runningChanged(bool is_running);
+    
 private slots:
     
-    void on_clipboardChange();
+    void onClipboardDataChanged();
+    
     void on_stateButton_clicked();
     void on_resetButton_clicked();
     void on_insertButton_clicked();
@@ -63,11 +75,12 @@ private slots:
     void on_parseButton_clicked();
     void on_clearButton_clicked();
     
-private:
+protected:
     
     Ui::MainDialog* ui;
     
     QClipboard* cb;
+    QSystemTrayIcon* _M_tray;
     
     enum class RunState: int { Running, Stopping } state = RunState::Running;
     

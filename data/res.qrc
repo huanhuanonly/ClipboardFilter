@@ -4,5 +4,7 @@
         <file>Icon/exit.svg</file>
         <file>Icon/topmost.svg</file>
         <file>Icon/topmost2.svg</file>
+        <file>Icon/shrink.svg</file>
+        <file>Icon/MainIcon.ico</file>
     </qresource>
 </RCC>

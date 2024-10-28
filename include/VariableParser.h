@@ -6,6 +6,8 @@
  * @brief Parse and replace variables in text,
  *        Defines and implements some default variables
  * 
+ * @ingroup huanhuan
+ * 
  * @include
  *     @namespace huanhuan
  *         @class VariableParser
@@ -29,62 +31,189 @@
 #include <QClipboard>
 #include <QGuiApplication>
 #include <QFile>
+#include <QCryptographicHash>
 
 #include <QHash>
+#include <QSet>
 
 #include <exception>
 #include <functional>
+#include <type_traits>
 
-#include "Trie.h"
+#include "Exception.h"
 
-#if !defined STR
-#define STR(str) #str
-#endif
-
-#if !defined STRVALUE
-#define STRVALUE(str) STR(str)
-#endif
+// Before including Trie.h
 
 namespace huanhuan
 {
 
-class VariableParser
+template<typename = QString>
+void popBack(QString& __c)
+{
+    __c.chop(1);
+}
+
+};
+
+#include "Trie.h"
+
+namespace huanhuan
+{
+
+class VariableParser : public Trie<QString, std::function<QString(QStringView, int)>>
 {
 public:
     
+    using VariableFuncPtr = QString (*)(QStringView, int);
+                                                                                      
     VariableParser();
     
-    using extra_end_character = std::invalid_argument;
+    using ExtraEndCharacterException = std::invalid_argument;
+    
+    using InvalidArgumentException = Exception;
+    
+    static inline VariableParser*
+    global() noexcept
+    {
+        static VariableParser parser;
+        return &parser;
+    }
     
     /**
      * @brief parse
      * 
-     * @param func Called when an exception is thrown
-     *     @param command : QStringView
-     *     @param what : const char*
-     *     
-     * @throw extra_end_character
+     * @tparam _StringType can only be QString or QStringView
+     * 
+     * @throw ExtraEndCharacterException
      */
-    QString parse(const QString& __text, const std::function<void(QStringView, const char*)>& __func = &defaultExceptionCallbackFunction) const;
+    template<typename _StringType>
+    typename std::enable_if<std::is_same_v<_StringType, QString> || std::is_same_v<_StringType, QStringView>, QString>::type
+    parse(const _StringType& __text) const;
     
-    static void defaultExceptionCallbackFunction(QStringView, const char*)
-    { }
+    inline void
+    setOnFailure(const std::function<void(QStringView, const char*)>& __func)
+    {
+        _M_onFailure = __func;
+    }
+    
+    inline const std::function<void(QStringView, const char*)>&
+    onFailure() const noexcept
+    {
+        return _M_onFailure;
+    }
     
 public:
     
-    void insert(const QString& __instruct, const std::function<QString(QStringView, int)>& __func)
-    {
-        _M_trie.insert(__instruct, __func);
-    }
-    
-    void remove(const QString& __instruct)
-    {
-        _M_trie.remove(__instruct);
-    }
-    
-    QString operator()(const QString& __text) const
+    inline QString
+    operator()(const QString& __text) const
     {
         return parse(__text);
+    }
+    
+    inline QString
+    operator()(QStringView __text) const
+    {
+        return parse(__text);
+    }
+    
+public:
+    
+    enum ExceptionEnum : int
+    {
+        EmptyArgument,
+        IncompleteArgument,
+        NotNumber,
+        NotNumberOrOutOfRange,
+        NotHexNumber,
+        NotHexNumberOrOutOfRange,
+        NotOctNumber,
+        NotOctNumberOrOutOfRange,
+        MustBeOrEmpty,
+        FileDoesNotExist,
+        FileOpenFailed,
+    };
+    
+    static inline constexpr std::pair<const char*, std::size_t>
+    get(ExceptionEnum __code)
+    {
+        switch (__code)
+        {
+        case EmptyArgument:
+            return getTextSizePair("The argument cannot be empty!");
+        case IncompleteArgument:
+            return getTextSizePair("Incomplete argument!");
+        case NotNumber:
+            return getTextSizePair("This is not a number (decimal, hexadecimal, binary or octal)!");
+        case NotNumberOrOutOfRange:
+            return getTextSizePair("This is not a number (decimal, hexadecimal, binary or octal) or is out of range [\0, \0]!");
+        case NotHexNumber:
+            return getTextSizePair("This is not a hex number!");
+        case NotHexNumberOrOutOfRange:
+            return getTextSizePair("This is not a hex number or is out of range [\0, \0]!");
+        case NotOctNumber:
+            return getTextSizePair("This is not a oct number!");
+        case NotOctNumberOrOutOfRange:
+            return getTextSizePair("This is not a oct number or is out of range [\0, \0]!");
+        case MustBeOrEmpty:
+            return getTextSizePair("The argument must be \0, or empty!");
+        case FileDoesNotExist:
+            return getTextSizePair("The file does not exist!");
+        case FileOpenFailed:
+            return getTextSizePair("File open failed!");
+        default:
+            return getTextSizePair("");
+        }
+    }
+    
+protected:
+    
+    // For param
+    
+    static inline void
+    _S_paramTrimmed(QStringView& __param) noexcept
+    {
+        __param = __param.trimmed();
+    }
+    
+    template<typename _Func>
+    static inline QVector<QStringView>
+    _S_paramSplit(QStringView __param, _Func __checker, bool __keepEmpty = false) noexcept
+    {
+        QVector<QStringView> list;
+        
+        int len = 0;
+        
+        for (int i = 0; i < static_cast<int>(__param.size()); ++i)
+        {
+            if (__checker(__param.at(i)))
+            {
+                if (len == 0 && __keepEmpty == false)
+                {
+                    continue;
+                }
+                
+                list.append(__param.mid(i - len, len));
+                len = 0;
+            }
+            else
+            {
+                ++len;
+            }
+        }
+        
+        if (len != 0 || __keepEmpty)
+        {
+            list.append(__param.mid(__param.size() - len, len));
+        }
+        
+        return list;
+    }
+    
+    static inline QVector<QStringView>
+    _S_paramSplit(QStringView __param, const QString& __charSet, bool __keepEmpty = false) noexcept
+    {
+        QSet<QChar> st(__charSet.cbegin(), __charSet.cend());
+        return _S_paramSplit(__param, [&st](QChar c) -> bool { return st.contains(c); }, __keepEmpty);
     }
     
 public:
@@ -100,6 +229,11 @@ public:
     {
         Q_UNUSED(__callNumber);
         
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
+        
         return QProcessEnvironment::systemEnvironment().value(__param.toString());
     }
     
@@ -112,6 +246,36 @@ public:
         Q_UNUSED(__callNumber)
         
         return QGuiApplication::clipboard()->text();
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(file)
+    {
+        Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        QFile file(__param.toString());
+        
+        if (file.exists() == false)
+        {
+            throw InvalidArgumentException(get(FileDoesNotExist));
+        }
+        
+        if (file.open(QIODevice::ReadOnly) == false)
+        {
+            throw InvalidArgumentException(get(FileOpenFailed));
+        }
+        
+        QString res = file.readAll();
+        
+        file.close();
+        
+        return res;
     }
     
     // Returns time or date
@@ -182,26 +346,32 @@ public:
     
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(date)
     {
-        Q_UNUSED(__param)
         Q_UNUSED(__callNumber)
-        
-        return QDate::currentDate().toString();
+    
+        if (__param.isEmpty())        
+            return QDate::currentDate().toString();
+        else
+            return QDate::currentDate().toString(__param);
     }
     
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(time)
     {
-        Q_UNUSED(__param)
         Q_UNUSED(__callNumber)
         
-        return QTime::currentTime().toString();
+        if (__param.isEmpty())
+            return QTime::currentTime().toString();
+        else
+            return QTime::currentTime().toString(__param);
     }
     
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(datetime)
     {
-        Q_UNUSED(__param)
         Q_UNUSED(__callNumber)
         
-        return QDateTime::currentDateTime().toString();
+        if (__param.isEmpty())
+            return QDateTime::currentDateTime().toString();
+        else
+            return QDateTime::currentDateTime().toString(__param);
     }
     
     // return special character
@@ -209,6 +379,13 @@ public:
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(escape)
     {
         Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
         
         static const std::map<char, char> mp{
             {'a', '\a'},
@@ -225,7 +402,7 @@ public:
         
         if (str.size() == 0)
         {
-            throw std::invalid_argument("Empty escape character!");
+            throw InvalidArgumentException(get(IncompleteArgument));
         }
         
         if (str.size() == 1)
@@ -249,7 +426,7 @@ public:
             
             if (ok == false)
             {
-                throw std::invalid_argument("A character that is out of range [0, F]!");
+                throw InvalidArgumentException(get(NotHexNumberOrOutOfRange)).fmt('0').fmt("0xff");
             }
             
             return QString(QChar(number));
@@ -263,7 +440,7 @@ public:
             
             if (ok == false)
             {
-                throw std::invalid_argument("A character that is not a digit exists or is out of range [0, 7]!");
+                throw InvalidArgumentException(get(NotOctNumberOrOutOfRange)).fmt('0').fmt("0o777");
             }
             
             return QString(QChar(number));
@@ -273,6 +450,8 @@ public:
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(linebreak)
     {
         Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
         
         if (__param.isEmpty())
         {
@@ -295,7 +474,7 @@ public:
             return QString("\n");
         }
         
-        throw std::invalid_argument("The argument must be 'CRLF' or 'LF', or empty!");
+        throw InvalidArgumentException(get(MustBeOrEmpty)).fmt("'CRLF' or 'LF'");
     }
     
     /**
@@ -306,15 +485,155 @@ public:
     {
         Q_UNUSED(__callNumber)
         
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
         bool ok = true;
         int number = __param.toInt(&ok, 0);
         
         if (ok == false)
         {
-            throw std::invalid_argument("This is not a number (decimal, hexadecimal, binary or octal)!");
+            throw InvalidArgumentException(get(NotNumber));
         }
         
         return QString(QChar(number));
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(toUnicode)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        QString result;
+        
+        for (int i = 0; i < static_cast<int>(__param.size()) - 1; ++i)
+        {
+            result.append(QString::number(__param.at(i).unicode()));
+            result.append(' ');
+        }
+        
+        if (__param.isEmpty() == false)
+        {
+            result.append(QString::number(__param.back().unicode()));
+        }
+        
+        return result;
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(toHtml)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        return __param.toString().toHtmlEscaped();
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(hex)
+    {
+        Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        bool ok = true;
+        quint64 number = __param.toULongLong(&ok, 0);
+        
+        if (ok == false)
+        {
+            throw InvalidArgumentException(get(NotNumberOrOutOfRange))
+                    .fmt(std::numeric_limits<decltype(number)>::min())
+                    .fmt(std::numeric_limits<decltype(number)>::max());
+        }
+        
+        return QString::number(number, 16);
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(oct)
+    {
+        Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        bool ok = true;
+        quint64 number = __param.toULongLong(&ok, 0);
+        
+        if (ok == false)
+        {
+            throw InvalidArgumentException(get(NotNumberOrOutOfRange))
+                    .fmt(std::numeric_limits<decltype(number)>::min())
+                    .fmt(std::numeric_limits<decltype(number)>::max());
+        }
+        
+        return QString::number(number, 8);
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(bin)
+    {
+        Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        bool ok = true;
+        quint64 number = __param.toULongLong(&ok, 0);
+        
+        if (ok == false)
+        {
+            throw InvalidArgumentException(get(NotNumberOrOutOfRange))
+                    .fmt(std::numeric_limits<decltype(number)>::min())
+                    .fmt(std::numeric_limits<decltype(number)>::max());
+        }
+        
+        return QString::number(number, 2);
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(dec)
+    {
+        Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        bool ok = true;
+        quint64 number = __param.toULongLong(&ok, 0);
+        
+        if (ok == false)
+        {
+            throw InvalidArgumentException(get(NotNumberOrOutOfRange))
+                    .fmt(std::numeric_limits<decltype(number)>::min())
+                    .fmt(std::numeric_limits<decltype(number)>::max());
+        }
+        
+        return QString::number(number, 10);
     }
     
     /**
@@ -324,6 +643,8 @@ public:
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(random)
     {
         Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
         
         auto list = __param.split(',');
         
@@ -335,7 +656,9 @@ public:
         qint64 lo = (list.size() >= 2 ? list.front().toLongLong(&ok, 0) : 0);
         
         if (ok == false)
-            throw std::invalid_argument("This is not a number (decimal, hexadecimal, binary or octal) or is out of range [" STRVALUE(LLONG_MIN) ", " STRVALUE(LLONG_MAX) "]!");
+            throw InvalidArgumentException(get(NotNumberOrOutOfRange))
+                    .fmt(std::numeric_limits<decltype(lo)>::min())
+                    .fmt(std::numeric_limits<decltype(lo)>::max());
         
         qint64 hi = (list.size() >= 2
                         ? list.back().toLongLong(&ok, 0)
@@ -346,7 +669,9 @@ public:
                     );
         
         if (ok == false)
-            throw std::invalid_argument("This is not a number (decimal, hexadecimal, binary or octal) or is out of range [" STRVALUE(LLONG_MIN) ", " STRVALUE(LLONG_MAX) "]!");
+            throw InvalidArgumentException(get(NotNumberOrOutOfRange))
+                    .fmt(std::numeric_limits<decltype(hi)>::min())
+                    .fmt(std::numeric_limits<decltype(hi)>::max());
         
         if (lo > hi)
         {
@@ -363,12 +688,54 @@ public:
         return QString::number(lo + static_cast<qint64>(res));
     }
     
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(randomlySelectOneChar)
+    {
+        Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        return QString(__param[QRandomGenerator::global()->bounded(static_cast<int>(__param.size()))]);
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(randomlySelectOneWord)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        auto res = _S_paramSplit(__param, [](QChar c) -> bool { return c.isPunct() || c.isSpace() || c.isSymbol(); }, false);
+        return res.at(QRandomGenerator::global()->bounded(static_cast<int>(res.size()))).toString();
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(randomlySelectOneLine)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+        {
+            throw InvalidArgumentException(get(EmptyArgument));
+        }
+        
+        auto res = _S_paramSplit(__param, [](QChar c) -> bool { return c == '\r' || c == '\n'; }, false);
+        return res.at(QRandomGenerator::global()->bounded(static_cast<int>(res.size()))).toString();
+    }
+    
     /**
      * @return A continuous subsequence in the custom range
      */
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(iota)
     {
         Q_UNUSED(__callNumber)
+        
+        _S_paramTrimmed(__param);
         
         // Single character, or empty
         if (__param.size() <= 1)
@@ -446,6 +813,8 @@ public:
     
     VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(index)
     {
+        _S_paramTrimmed(__param);
+        
         static int lastCallNumber = -1;
         static QHash<decltype(__param), int> map;
         
@@ -458,59 +827,106 @@ public:
         return QString::number(++map[__param]);
     }
     
-    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(file)
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(shuffle)
     {
         Q_UNUSED(__callNumber)
         
-        QFile file(__param.toString());
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
         
-        if (file.exists() == false)
-        {
-            throw std::invalid_argument("The file does not exist!");
-        }
+        QString result = __param.toString();
         
-        if (file.open(QIODevice::ReadOnly) == false)
-        {
-            throw std::invalid_argument("File open failed!");
-        }
+        std::shuffle(result.begin(), result.end(), *QRandomGenerator::global());
         
-        QString res = file.readAll();
+        return result;
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(sort)
+    {
+        Q_UNUSED(__callNumber)
         
-        file.close();
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
         
-        return res;
+        QString result = __param.toString();
+        
+        std::sort(result.begin(), result.end());
+        
+        return result;
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(reverse)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
+        
+        QString result = __param.toString();
+        
+        std::reverse(result.begin(), result.end());
+        
+        return result;
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(hash)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
+        
+        return QString(
+                QCryptographicHash::hash(
+                    __param.toLocal8Bit(),
+                    QCryptographicHash::Algorithm::Md5).toHex());
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(toUpper)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
+        
+        return __param.toString().toUpper();
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(toLower)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
+        
+        return __param.toString().toLower();
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(trimmed)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
+        
+        return __param.trimmed().toString();
+    }
+    
+    VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION(simplified)
+    {
+        Q_UNUSED(__callNumber)
+        
+        if (__param.isEmpty())
+            throw InvalidArgumentException(get(EmptyArgument));
+        
+        return __param.toString().simplified();
     }
     
 #undef VARIABLE_PARSER__PREDEFINED_VARIABLE_FUNCTION
     
-public:
-    
-    inline static const std::map<const char*, QString(*)(QStringView, int)> predefinedVariables {
-        { "env", &_S_env },
-        { "clipboard", &_S_clipboard },
-        { "hour", &_S_hour },
-        { "minute", &_S_minute },
-        { "second", &_S_second },
-        { "msec", &_S_msec },
-        { "year", &_S_year },
-        { "month", &_S_month },
-        { "day", &_S_day },
-        { "week", &_S_week },
-        { "date", &_S_date },
-        { "time", &_S_time },
-        { "datetime", &_S_datetime },
-        { "escape", &_S_escape },
-        { "linebreak", &_S_linebreak },
-        { "unicode", &_S_unicode },
-        { "random", &_S_random },
-        { "iota", &_S_iota },
-        { "index", &_S_index },
-        { "file", &_S_file }
-    };
-    
 private:
     
-    Trie<QString, std::function<QString(QStringView, int)>> _M_trie;
+    std::function<void(QStringView, const char*)> _M_onFailure;
     
     mutable int _M_callNumber = 0;
 };

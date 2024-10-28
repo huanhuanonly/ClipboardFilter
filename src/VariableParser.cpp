@@ -3,7 +3,9 @@
  * 
  * @author YangHuanhuan (3347484963@qq.com)
  * 
- * @brief Implement @class VariableParser
+ * @brief @implements @class VariableParser
+ *     
+ * @ingroup huanhuan
  *     
  * @list VariableParser.h
  *       Logger.h
@@ -15,34 +17,61 @@
 using namespace huanhuan;
 
 VariableParser::VariableParser()
-{
-    for (const auto& [key, value] : predefinedVariables)
-    {
-        _M_trie.insert(key, value);
-    }
-    
-//    _M_trie.insert("env", &_S_env);
-//    _M_trie.insert("clipboard", &_S_clipboard);
-//    _M_trie.insert("hour", &_S_hour);
-//    _M_trie.insert("minute", &_S_minute);
-//    _M_trie.insert("second", &_S_second);
-//    _M_trie.insert("msec", &_S_msec);
-//    _M_trie.insert("year", &_S_year);
-//    _M_trie.insert("month", &_S_month);
-//    _M_trie.insert("day", &_S_day);
-//    _M_trie.insert("week", &_S_week);
-//    _M_trie.insert("date", &_S_date);
-//    _M_trie.insert("time", &_S_time);
-//    _M_trie.insert("datetime", &_S_datetime);
-//    _M_trie.insert("escape", &_S_escape);
-//    _M_trie.insert("linebreak", &_S_linebreak);
-//    _M_trie.insert("unicode", &_S_unicode);
-//    _M_trie.insert("random", &_S_random);
-//    _M_trie.insert("iota", &_S_iota);
-//    _M_trie.insert("index", &_S_index);
-}
+    : Trie {
+        // Get External Text
+        { "env", &_S_env },
+        { "clipboard", &_S_clipboard },
+        { "file", &_S_file },
+        
+        // Get Current Time
+        { "hour", &_S_hour },
+        { "minute", &_S_minute },
+        { "second", &_S_second },
+        { "msec", &_S_msec },
+        { "year", &_S_year },
+        { "month", &_S_month },
+        { "day", &_S_day },
+        { "week", &_S_week },
+        { "date", &_S_date },
+        { "time", &_S_time },
+        { "datetime", &_S_datetime },
+        
+        // Encode to Text
+        { "escape", &_S_escape },
+        { "linebreak", &_S_linebreak },
+        { "unicode", &_S_unicode },
+        
+        // Text to Encoding
+        { "tounicode", &_S_toUnicode },
+        { "tohtml", &_S_toHtml },
+        { "hex", &_S_hex },
+        { "oct", &_S_oct },
+        { "bin", &_S_bin },
+        { "dec", &_S_dec },
+        
+        // Dynamic Variables
+        { "random", &_S_random },
+        { "rsoc", &_S_randomlySelectOneChar },
+        { "rsow", &_S_randomlySelectOneWord },
+        { "rsol", &_S_randomlySelectOneLine },
+        { "iota", &_S_iota },
+        { "index", &_S_index },
+        
+        // Text Transformation
+        { "shuffle", &_S_shuffle },
+        { "sort", &_S_sort },
+        { "reverse", &_S_reverse },
+        { "hash", &_S_hash },
+        { "toupper", &_S_toUpper },
+        { "tolower", &_S_toLower },
+        { "trimmed", &_S_trimmed },
+        { "simplified", &_S_simplified }
+    }, _M_onFailure([](QStringView, const char*) -> void { })
+{ }
 
-QString VariableParser::parse(const QString& text, const std::function<void(QStringView, const char*)>& func) const
+template<typename _StringType>
+typename std::enable_if<std::is_same_v<_StringType, QString> || std::is_same_v<_StringType, QStringView>, QString>::type
+VariableParser::parse(const _StringType& text) const
 {
     constexpr const QChar tag('$');
     constexpr const QChar range[2] = {'{', '}'};
@@ -70,11 +99,11 @@ QString VariableParser::parse(const QString& text, const std::function<void(QStr
             }
             
             QStringView instruct = command.left(index_of_sep);
-            QStringView parameter = command.right(command.size() - instruct.size() - (index_of_sep != command.size())).trimmed();
+            QStringView parameter = command.right(command.size() - instruct.size() - (index_of_sep != command.size()));
             
             instruct = instruct.trimmed();
             
-            auto func_ptr = _M_trie.find(instruct.toString());
+            auto func_ptr = find(instruct.toString());
             
             if (func_ptr != nullptr)
             {
@@ -94,9 +123,17 @@ QString VariableParser::parse(const QString& text, const std::function<void(QStr
                 }
                 catch (const std::exception& e)
                 {
-                    func(command, e.what());
+                    _M_onFailure(command, e.what());
                 }
             }
+            else if constexpr (SETTINGS__LOGGER_OUTPUT__RESULT_OF_VARIABLES)
+            {
+                slog << QObject::tr("Warning: ${ %0%1 } is not found!")
+                        .arg(instruct)
+                        .arg(parameter.isEmpty() ? QString("") : QString(" : %0").arg(parameter))
+                     << endl;
+            }
+            
             
             // Merge with previous
             if (buffer.size() >= 2)
@@ -106,7 +143,7 @@ QString VariableParser::parse(const QString& text, const std::function<void(QStr
             }
             else
             {
-                throw extra_end_character("Extra end-character '}'!");
+                throw ExtraEndCharacterException("Extra end-character '}'!");
             }
         }
         else
@@ -119,3 +156,6 @@ QString VariableParser::parse(const QString& text, const std::function<void(QStr
     
     return buffer.front();
 }
+
+template QString VariableParser::parse(const QString&) const;
+template QString VariableParser::parse(const QStringView&) const;

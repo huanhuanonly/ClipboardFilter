@@ -4,6 +4,8 @@
  * @author YangHuanhuan (3347484963@qq.com)
  * 
  * @implements main() function
+ * 
+ * @ingroup huanhuan::main
  */
 
 #include "maindialog.h"

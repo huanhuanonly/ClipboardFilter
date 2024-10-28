@@ -5,6 +5,8 @@
  * 
  * @brief Record global log
  * 
+ * @ingroup huanhuan
+ * 
  * @include
  *     @namespace huanhuan
  *         @class    Logger
