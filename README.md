@@ -43,7 +43,7 @@
 ## Download
 
 ```git
-git clone https://github.com/huanhuanonly/ClipboardFilter
+git clone https://github.com/huanhuanonly/ClipboardFilter.git
 ```
 
 ### Download the Packaged File
@@ -199,8 +199,6 @@ ${ variable-name [: parameter] }
 * `simplified`: Trim whitespace from both ends and replace each sequence of internal spaces with a single space.
   * `param`: Text.
   * For example: `${simplified: I   Love You 1314 }` returns `I Love You 1314`.
-
-Here's the translation:
 
 ##### Special Variables
 

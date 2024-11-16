@@ -42,7 +42,7 @@
 ## 下载
 
 ```git
-git clone https://github.com/huanhuanonly/ClipboardFilter
+git clone https://github.com/huanhuanonly/ClipboardFilter.git
 ```
 
 ### 下载封装后的文件
